@@ -1,3 +1,3 @@
-# HTML Learning
+# html-learning
 
-HTML learning notes and examples.
+学习 HTML 的笔记与示例。
