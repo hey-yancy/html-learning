@@ -197,7 +197,33 @@ footer.end{text-align:center;color:var(--muted);font-size:13px;padding:20px 0 40
   .hero h1{font-size:24px}.chapter-num{width:42px;height:42px;font-size:17px}
   h2.ch-title{font-size:21px}
 }
-@media print{.topbar,.sidebar,.to-top,.progress{display:none}main{margin:0;padding:0}.chapter,.hero{box-shadow:none;break-inside:avoid}}
+/* ---------- 复习模式 / 章节折叠 ---------- */
+.chapter-head{position:relative}
+.fold-hint{position:absolute;right:0;top:2px;font-size:11px;color:var(--muted);background:var(--panel2);
+  border:1px solid var(--border);border-radius:6px;padding:2px 9px;white-space:nowrap}
+.chapter.collapsed > *:not(.chapter-head){display:none}
+.chapter.collapsed{padding-bottom:18px}
+.chapter.collapsed .chapter-head{border-bottom:0;margin-bottom:0;padding-bottom:0}
+.text-btn{height:34px;padding:0 12px;border:1px solid var(--border);background:var(--panel2);color:var(--muted);
+  border-radius:9px;font-size:12.5px;cursor:pointer;font-family:inherit;transition:.2s;white-space:nowrap}
+.text-btn:hover,.text-btn.active{color:#fff;background:var(--accent);border-color:var(--accent)}
+.read-hint{font-size:12.5px;color:var(--muted);margin:16px 0 0;padding-top:12px;border-top:1px dashed var(--border)}
+.read-hint b{color:var(--accent)}
+body.review .hero{display:none}
+body.review main{padding-top:80px}
+body.review .chapter > p,
+body.review .chapter > ul.plain,
+body.review .chapter > ol.plain,
+body.review .chapter > .callout,
+body.review .chapter > h4{display:none}
+body.review .chapter{padding:20px 26px 22px}
+body.review .chapter-head{padding-bottom:14px;margin-bottom:14px}
+body.review .chapter-num{width:42px;height:42px;font-size:17px}
+body.review h2.ch-title{font-size:20px}
+body.review .demo{margin:12px 0}
+body.review .recap{margin-top:14px}
+body.review .quiz{margin:8px 0}
+@media print{.topbar,.sidebar,.to-top,.progress,.fold-hint{display:none}main{margin:0;padding:0}.chapter,.hero{box-shadow:none;break-inside:avoid}}
 </style>
 </head>
 <body>
@@ -212,6 +238,7 @@ footer.end{text-align:center;color:var(--muted);font-size:13px;padding:20px 0 40
     <span>HTML 完整学习笔记</span><em>v1.0</em>
   </a>
   <div class="top-actions">
+    <button class="text-btn" id="reviewBtn" title="收起讲解，只保留速记、表格与代码示例">复习模式</button>
     <div class="search">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
       <input id="search" type="search" placeholder="搜索章节 / 关键字" autocomplete="off"><kbd>Ctrl K</kbd>
@@ -231,7 +258,7 @@ footer.end{text-align:center;color:var(--muted);font-size:13px;padding:20px 0 40
   <div class="toc-empty" id="tocEmpty">没有匹配的章节，换个关键词试试</div>
   <div class="side-foot">
     单文件离线笔记 · 所有示例均可真实运行<br>
-    作者：邓佳燕 · 软件工程 1 班
+    学习笔记 · 持续更新
   </div>
 </aside>
 <div class="overlay" id="overlay"></div>
@@ -254,6 +281,10 @@ footer.end{text-align:center;color:var(--muted);font-size:13px;padding:20px 0 40
     <a class="btn" href="#ch-14">直接看综合实战</a>
     <a class="btn" href="#ch-15">速查表与自测</a>
   </div>
+  <p class="read-hint"><b>想更系统地通读或复习？</b>同目录下的 <code class="inline">NOTE.md</code>（完整阅读版）、
+    <code class="inline">docs/ch01.md</code> 起的分章笔记、<code class="inline">CHEATSHEET.md</code>（一页纸速查）、
+    <code class="inline">REVIEW.md</code>（45 道自测题）可在 Github 或编辑器里直接阅读；
+    点右上角「复习模式」可把本页变成紧凑速查表。</p>
 </section>
 
 <!-- ============ 01 ============ -->
@@ -523,7 +554,7 @@ footer.end{text-align:center;color:var(--muted);font-size:13px;padding:20px 0 40
   <caption>2026 秋季学期 · 前端课程成绩</caption>
   <thead><tr><th scope="col">姓名</th><th scope="col">HTML</th><th scope="col">CSS</th><th scope="col">总评</th></tr></thead>
   <tbody>
-    <tr><th scope="row">邓佳燕</th><td>95</td><td>90</td><td>优秀</td></tr>
+    <tr><th scope="row">同学 A</th><td>95</td><td>90</td><td>优秀</td></tr>
     <tr><th scope="row">同学 B</th><td>86</td><td>88</td><td>良好</td></tr>
   </tbody>
   <tfoot><tr><th scope="row">平均分</th><td>90.5</td><td>89</td><td>—</td></tr></tfoot>
@@ -1043,7 +1074,7 @@ footer.end{text-align:center;color:var(--muted);font-size:13px;padding:20px 0 40
   <div class="demo" data-title="示例 14-1 · 综合实战：个人主页（可直接点击交互）">
 <script type="text/plain" class="demo-src">
 <header style="background:linear-gradient(120deg,#e44d26,#f16529);color:#fff;border-radius:10px;padding:16px 20px">
-  <h1 style="margin:0;font-size:22px">邓佳燕 · 前端学习笔记</h1>
+  <h1 style="margin:0;font-size:22px">我的前端学习笔记</h1>
   <nav style="margin-top:8px;font-size:13px">
     <a href="#about" style="color:#fff;margin-right:14px">关于我</a>
     <a href="#skill" style="color:#fff;margin-right:14px">技能表</a>
@@ -1054,7 +1085,7 @@ footer.end{text-align:center;color:var(--muted);font-size:13px;padding:20px 0 40
   <main style="flex:3;min-width:260px">
     <section id="about" style="background:#f7f9fc;border-radius:10px;padding:14px 18px;margin-bottom:12px">
       <h2 style="margin:0 0 8px;font-size:18px;color:#e44d26">关于我</h2>
-      <p style="margin:4px 0">软件工程 1 班，正在系统学习前端三件套。这篇笔记是 HTML 阶段的成果汇总。</p>
+      <p style="margin:4px 0">正在系统学习前端三件套。这篇笔记是 HTML 阶段的成果汇总。</p>
       <figure style="margin:10px 0 0;text-align:center">
         <div style="height:70px;line-height:70px;background:linear-gradient(120deg,#ffe4d6,#ffd0bb);border-radius:8px;color:#b5401c;font-weight:700">封面图 · &lt;img alt="学习封面"&gt;</div>
         <figcaption style="font-size:12px;color:#6c7686">图 14-1：figure + figcaption</figcaption>
@@ -1091,7 +1122,7 @@ footer.end{text-align:center;color:var(--muted);font-size:13px;padding:20px 0 40
   </aside>
 </div>
 <footer style="text-align:center;color:#6c7686;font-size:12px;margin-top:14px;padding:10px;border-top:1px solid #e2e7ee">
-  © 2026 邓佳燕 · <a href="#top">回到顶部</a> · <time datetime="2026-11-18">2026-11-18</time>
+  © 2026 · <a href="#top">回到顶部</a> · <time datetime="2026-11-18">2026-11-18</time>
 </footer>
 </script>
   </div>
@@ -1192,7 +1223,7 @@ footer.end{text-align:center;color:var(--muted);font-size:13px;padding:20px 0 40
 
 <footer class="end">
   HTML 完整学习笔记 · 共 15 章 · 全部示例均为浏览器真实渲染<br>
-  作者：邓佳燕（软件工程 1 班） · 仓库：hey-yancy/html-learning
+  仓库：hey-yancy/html-learning
 </footer>
 </div></main>
 
@@ -1210,6 +1241,24 @@ footer.end{text-align:center;color:var(--muted);font-size:13px;padding:20px 0 40
     var dark = body.getAttribute('data-theme')==='dark';
     if(dark) body.removeAttribute('data-theme'); else body.setAttribute('data-theme','dark');
     try{ localStorage.setItem('html-note-theme', dark?'light':'dark'); }catch(e){}
+  });
+
+  /* ---------- 复习模式与章节折叠 ---------- */
+  var reviewBtn = document.getElementById('reviewBtn');
+  var chapterEls = [].slice.call(document.querySelectorAll('.chapter'));
+  chapterEls.forEach(function(sec){
+    var head = sec.querySelector('.chapter-head');
+    if(!head) return;
+    head.insertAdjacentHTML('beforeend','<span class="fold-hint">点击折叠</span>');
+    head.addEventListener('click', function(){ sec.classList.toggle('collapsed'); });
+  });
+  reviewBtn.addEventListener('click', function(){
+    var on = !body.classList.contains('review');
+    body.classList.toggle('review', on);
+    chapterEls.forEach(function(c){ c.classList.toggle('collapsed', on); });
+    reviewBtn.textContent = on ? '退出复习' : '复习模式';
+    reviewBtn.classList.toggle('active', on);
+    if(on) window.scrollTo({top:0,behavior:'smooth'});
   });
 
   /* ---------- 代码高亮 ---------- */
@@ -1375,7 +1424,14 @@ footer.end{text-align:center;color:var(--muted);font-size:13px;padding:20px 0 40
     sidebar.classList.toggle('open'); overlay.classList.toggle('show');
   });
   overlay.addEventListener('click', closeSide);
-  toc.addEventListener('click', function(e){ if(e.target.closest('a') && window.innerWidth<=1000) closeSide(); });
+  toc.addEventListener('click', function(e){
+    var a = e.target.closest('a');
+    if(!a) return;
+    var target = document.getElementById(a.getAttribute('data-id'));
+    var sec = target && target.closest('.chapter');
+    if(sec) sec.classList.remove('collapsed');
+    if(window.innerWidth<=1000) closeSide();
+  });
 })();
 </script>
 </body>
