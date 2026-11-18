@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="一份带索引目录、可直接运行示例与运行效果预览的完整 HTML 学习笔记">
+<title>HTML 完整学习笔记 · 带索引与运行效果</title>
+<style>
+:root{
+  --bg:#f5f7fa; --panel:#ffffff; --panel2:#fafbfd; --text:#1e2532; --muted:#6c7686;
+  --border:#e2e7ee; --accent:#e44d26; --accent2:#f16529; --soft:#fff2ed;
+  --code-bg:#1d2431; --code-fg:#dce5f2; --shadow:0 3px 18px rgba(30,45,80,.07);
+  --radius:14px; --sidebar:286px;
+}
+body[data-theme="dark"]{
+  --bg:#12161e; --panel:#1a202b; --panel2:#1e2531; --text:#e6ebf3; --muted:#97a2b3;
+  --border:#2b3442; --accent:#ff8358; --accent2:#ffa172; --soft:#2a201d;
+  --code-bg:#0f141c; --code-fg:#dbe5f2; --shadow:0 3px 18px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:86px}
+body{margin:0;background:var(--bg);color:var(--text);
+  font-family:"Segoe UI","PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+  font-size:15.5px;line-height:1.78;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+svg{display:block}
+::selection{background:var(--accent);color:#fff}
+
+/* ---------- 顶部栏 ---------- */
+.progress{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));z-index:99;transition:width .1s}
+.topbar{position:fixed;top:0;left:0;right:0;height:60px;background:var(--panel);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:14px;padding:0 20px;z-index:80;box-shadow:0 1px 8px rgba(30,45,80,.04)}
+.brand{display:flex;align-items:center;gap:10px;color:var(--text);font-weight:700;font-size:16px;white-space:nowrap}
+.brand:hover{text-decoration:none}
+.brand .shield{width:26px;height:28px}
+.brand em{font-style:normal;font-size:11px;font-weight:600;color:var(--accent);background:var(--soft);
+  border:1px solid var(--border);padding:2px 7px;border-radius:20px}
+.top-actions{margin-left:auto;display:flex;align-items:center;gap:9px}
+.search{display:flex;align-items:center;gap:7px;background:var(--panel2);border:1px solid var(--border);
+  border-radius:9px;padding:0 10px;height:34px;width:240px;transition:border-color .2s}
+.search:focus-within{border-color:var(--accent)}
+.search input{border:0;outline:0;background:transparent;color:var(--text);width:100%;font-size:13px}
+.search input::placeholder{color:var(--muted)}
+.search kbd{font-size:10px;color:var(--muted);border:1px solid var(--border);border-radius:4px;padding:1px 5px;white-space:nowrap}
+.icon-btn,.menu-btn{width:34px;height:34px;border:1px solid var(--border);background:var(--panel2);color:var(--muted);
+  border-radius:9px;display:grid;place-items:center;cursor:pointer;transition:.2s}
+.icon-btn:hover,.menu-btn:hover{color:var(--accent);border-color:var(--accent)}
+.menu-btn{display:none}
+
+/* ---------- 侧边索引 ---------- */
+.sidebar{position:fixed;top:60px;left:0;bottom:0;width:var(--sidebar);background:var(--panel);
+  border-right:1px solid var(--border);overflow-y:auto;z-index:70;padding:18px 12px 30px}
+.side-meta{font-size:11px;letter-spacing:.12em;color:var(--muted);font-weight:700;padding:0 12px 12px;text-transform:uppercase}
+.toc-group{margin-bottom:14px}
+.toc-group-title{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--muted);
+  padding:6px 12px;cursor:pointer;user-select:none;letter-spacing:.04em}
+.toc-group-title::before{content:"";width:6px;height:6px;border-radius:2px;background:var(--accent);opacity:.75}
+.toc-group-title .chev{margin-left:auto;transition:transform .2s;font-size:10px}
+.toc-group.collapsed .chev{transform:rotate(-90deg)}
+.toc-group.collapsed .toc-list{display:none}
+.toc-list{display:flex;flex-direction:column;gap:1px}
+.toc-item{display:block;padding:6px 12px 6px 20px;border-radius:8px;color:var(--text);font-size:13.5px;
+  border-left:2px solid transparent;line-height:1.5;transition:.15s}
+.toc-item:hover{background:var(--panel2);text-decoration:none}
+.toc-item .num{color:var(--muted);font-size:11px;margin-right:7px;font-variant-numeric:tabular-nums}
+.toc-item.active{background:var(--soft);border-left-color:var(--accent);color:var(--accent);font-weight:700}
+.toc-sub{padding:3px 12px 3px 44px;font-size:12.5px;color:var(--muted);display:block;border-radius:7px}
+.toc-sub:hover{background:var(--panel2);text-decoration:none;color:var(--text)}
+.toc-sub.active{color:var(--accent);font-weight:600}
+.toc-empty{display:none;padding:10px 14px;font-size:12px;color:var(--muted)}
+.side-foot{margin:22px 12px 0;padding-top:16px;border-top:1px solid var(--border);font-size:11.5px;color:var(--muted);line-height:1.8}
+.overlay{display:none;position:fixed;inset:60px 0 0;background:rgba(15,23,42,.4);z-index:65}
+
+/* ---------- 主体 ---------- */
+main{margin-left:var(--sidebar);padding:92px 40px 90px;max-width:1180px}
+.content{max-width:920px;margin:0 auto}
+.hero{background:linear-gradient(135deg,var(--panel),var(--panel2));border:1px solid var(--border);
+  border-radius:20px;padding:42px 44px;margin-bottom:34px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.hero::after{content:"";position:absolute;right:-70px;top:-70px;width:260px;height:260px;border-radius:50%;
+  background:radial-gradient(circle,var(--soft) 0%,transparent 70%)}
+.hero .kicker{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.1em;color:var(--accent);
+  background:var(--soft);border:1px solid var(--border);padding:4px 12px;border-radius:20px;margin-bottom:16px}
+.hero h1{font-size:36px;line-height:1.3;margin:0 0 12px;letter-spacing:-.02em}
+.hero h1 span{color:var(--accent)}
+.hero p{color:var(--muted);margin:0 0 22px;max-width:620px;font-size:15px}
+.badges{display:flex;flex-wrap:wrap;gap:9px}
+.badge{font-size:12px;color:var(--muted);background:var(--panel);border:1px solid var(--border);
+  border-radius:8px;padding:5px 11px}
+.badge b{color:var(--accent);font-variant-numeric:tabular-nums}
+.hero-actions{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:7px;border-radius:9px;padding:9px 16px;font-size:13.5px;
+  font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--panel);color:var(--text);transition:.2s}
+.btn:hover{text-decoration:none;transform:translateY(-1px)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent2)}
+
+.chapter{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
+  padding:30px 34px 34px;margin-bottom:26px;box-shadow:var(--shadow);scroll-margin-top:86px}
+.chapter-head{display:flex;gap:18px;align-items:flex-start;border-bottom:1px solid var(--border);padding-bottom:20px;margin-bottom:22px}
+.chapter-num{flex:none;width:52px;height:52px;border-radius:14px;background:var(--soft);color:var(--accent);
+  display:grid;place-items:center;font-size:21px;font-weight:800;font-variant-numeric:tabular-nums;border:1px solid var(--border)}
+h2.ch-title{margin:0;font-size:25px;line-height:1.35;letter-spacing:-.01em;scroll-margin-top:86px}
+.ch-desc{margin:5px 0 0;color:var(--muted);font-size:13.5px}
+h3.sub{font-size:17.5px;margin:30px 0 12px;padding-left:12px;border-left:3px solid var(--accent);scroll-margin-top:86px;line-height:1.5}
+h4{font-size:15px;margin:22px 0 8px;color:var(--text)}
+p{margin:10px 0}
+ul.plain,ol.plain{padding-left:22px;margin:10px 0}
+ul.plain li,ol.plain li{margin:5px 0}
+code.inline{background:var(--soft);color:var(--accent);border:1px solid var(--border);border-radius:5px;
+  padding:1px 6px;font-size:.89em;font-family:Consolas,"Courier New",monospace}
+strong{font-weight:700}
+
+/* ---------- 表格 ---------- */
+table.t{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;display:table}
+table.t th,table.t td{border:1px solid var(--border);padding:9px 12px;text-align:left;vertical-align:top}
+table.t th{background:var(--panel2);font-weight:700;white-space:nowrap}
+table.t tr:nth-child(even) td{background:var(--panel2)}
+table.t td code{white-space:nowrap}
+.tw{overflow-x:auto}
+
+/* ---------- 提示框 ---------- */
+.callout{border:1px solid var(--border);border-left:3px solid var(--accent);background:var(--panel2);
+  border-radius:9px;padding:12px 16px;margin:16px 0;font-size:14px}
+.callout .lb{display:block;font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--accent);margin-bottom:3px}
+.callout.warn{border-left-color:#d99b16;background:#fffbf0}
+.callout.warn .lb{color:#b97c08}
+body[data-theme="dark"] .callout.warn{background:#2a2417}
+.callout.info{border-left-color:#2b7fd4;background:#f2f8ff}
+.callout.info .lb{color:#1f6fbe}
+body[data-theme="dark"] .callout.info{background:#182433}
+.callout p{margin:4px 0}
+
+/* ---------- 示例：代码 + 运行效果 ---------- */
+.demo{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:18px 0 8px;background:var(--panel)}
+.demo-head{display:flex;align-items:center;gap:10px;background:var(--panel2);border-bottom:1px solid var(--border);padding:8px 14px}
+.demo-title{font-size:12.5px;font-weight:700;color:var(--text)}
+.demo-title::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:8px}
+.demo-actions{margin-left:auto;display:flex;gap:6px}
+.demo-actions button{font-size:11.5px;color:var(--muted);background:var(--panel);border:1px solid var(--border);
+  border-radius:6px;padding:3px 9px;cursor:pointer;font-family:inherit;transition:.15s}
+.demo-actions button:hover{color:var(--accent);border-color:var(--accent)}
+.demo-actions button.ok{color:#198754;border-color:#198754}
+pre.code{margin:0;background:var(--code-bg);color:var(--code-fg);padding:16px 18px;overflow-x:auto;
+  font-family:Consolas,"SFMono-Regular","Courier New",monospace;font-size:12.8px;line-height:1.7;tab-size:2}
+pre.code code{font-family:inherit;white-space:pre}
+.tk-com{color:#7d8da5;font-style:italic}
+.tk-tag{color:#ff8a65}
+.tk-attr{color:#82d2ff}
+.tk-str{color:#a5e075}
+.tk-ent{color:#e6b980}
+.preview{border-top:1px solid var(--border);background:#fff}
+.browser-bar{height:32px;background:#eef1f5;border-bottom:1px solid #dfe4ea;display:flex;align-items:center;gap:10px;padding:0 12px}
+.dots{display:flex;gap:5px}
+.dots i{width:9px;height:9px;border-radius:50%;display:block}
+.dots i:nth-child(1){background:#ff5f57}.dots i:nth-child(2){background:#febc2e}.dots i:nth-child(3){background:#28c840}
+.url{font-size:11px;color:#7a8494;background:#fff;border:1px solid #e0e5ec;border-radius:5px;padding:2px 12px;flex:1;text-align:center;max-width:340px;margin:0 auto}
+.live{font-size:9.5px;font-weight:800;letter-spacing:.1em;color:#198754;background:#e3f6ec;border-radius:4px;padding:2px 6px}
+.preview iframe{display:block;width:100%;height:120px;border:0;background:#fff}
+.preview-cap{font-size:11.5px;color:var(--muted);background:var(--panel2);border-top:1px solid var(--border);padding:6px 14px}
+.recap{background:var(--soft);border:1px dashed var(--accent);border-radius:10px;padding:12px 16px;margin-top:22px;font-size:13.5px}
+.recap b{color:var(--accent)}
+
+/* ---------- 速查 / 自测 ---------- */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card{border:1px solid var(--border);border-radius:10px;padding:14px 16px;background:var(--panel2)}
+.card h4{margin:0 0 8px;color:var(--accent);font-size:14px}
+.card ul{margin:0;padding-left:18px;font-size:13.5px}
+.quiz{border:1px solid var(--border);border-radius:10px;margin:10px 0;background:var(--panel2);overflow:hidden}
+.quiz summary{cursor:pointer;padding:11px 15px;font-weight:600;font-size:14px;list-style:none}
+.quiz summary::-webkit-details-marker{display:none}
+.quiz summary::before{content:"Q";display:inline-grid;place-items:center;width:20px;height:20px;border-radius:6px;
+  background:var(--soft);color:var(--accent);font-size:11px;margin-right:9px}
+.quiz[open] summary{border-bottom:1px solid var(--border)}
+.quiz .ans{padding:11px 16px;font-size:13.5px;color:var(--muted)}
+.quiz .ans b{color:var(--text)}
+footer.end{text-align:center;color:var(--muted);font-size:13px;padding:20px 0 40px}
+.to-top{position:fixed;right:24px;bottom:26px;width:40px;height:40px;border-radius:50%;border:1px solid var(--border);
+  background:var(--panel);color:var(--accent);box-shadow:var(--shadow);cursor:pointer;font-size:18px;
+  opacity:0;pointer-events:none;transition:.25s;z-index:60}
+.to-top.show{opacity:1;pointer-events:auto}
+
+@media (max-width:1000px){
+  .menu-btn{display:grid}
+  .sidebar{transform:translateX(-100%);transition:transform .25s;box-shadow:var(--shadow)}
+  .sidebar.open{transform:translateX(0)}
+  .overlay.show{display:block}
+  main{margin-left:0;padding:82px 20px 70px}
+  .search{width:170px}.search kbd{display:none}
+  .brand span{font-size:14px}
+  .hero{padding:30px 24px}.hero h1{font-size:28px}
+  .chapter{padding:24px 20px}
+  .grid2{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .search{display:none}.brand em{display:none}
+  .hero h1{font-size:24px}.chapter-num{width:42px;height:42px;font-size:17px}
+  h2.ch-title{font-size:21px}
+}
+@media print{.topbar,.sidebar,.to-top,.progress{display:none}main{margin:0;padding:0}.chapter,.hero{box-shadow:none;break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<header class="topbar">
+  <button class="menu-btn" id="menuBtn" aria-label="打开目录">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="brand" href="#top">
+    <svg class="shield" viewBox="0 0 32 34" aria-hidden="true"><path d="M2 1h28l-2.5 28L16 33 2.5 29 2 1z" fill="#e44d26"/><path d="M16 4v26l10-2.7L28.5 4H16z" fill="#f16529"/><path d="M9 10h6v3h-2.5v3H15v3h-2.5v3H9V10zm8 0h6l-1 8-2 1.5-1.6-1.5-.3-3H17v-2h3.6l.2-2H17v-1z" fill="#fff"/></svg>
+    <span>HTML 完整学习笔记</span><em>v1.0</em>
+  </a>
+  <div class="top-actions">
+    <div class="search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+      <input id="search" type="search" placeholder="搜索章节 / 关键字" autocomplete="off"><kbd>Ctrl K</kbd>
+    </div>
+    <button class="icon-btn" id="themeBtn" title="切换深色 / 浅色主题" aria-label="切换主题">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>
+    </button>
+    <a class="icon-btn" href="https://github.com/hey-yancy/html-learning" target="_blank" rel="noopener" title="查看 Github 仓库" aria-label="Github 仓库">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.5 9.5 0 0112 6.8c.85 0 1.71.11 2.51.34 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0012 2z"/></svg>
+    </a>
+  </div>
+</header>
+
+<aside class="sidebar" id="sidebar">
+  <div class="side-meta">索引目录 · 共 <span id="chapterCount">15</span> 章</div>
+  <nav id="toc" aria-label="笔记目录"></nav>
+  <div class="toc-empty" id="tocEmpty">没有匹配的章节，换个关键词试试</div>
+  <div class="side-foot">
+    单文件离线笔记 · 所有示例均可真实运行<br>
+    作者：邓佳燕 · 软件工程 1 班
+  </div>
+</aside>
+<div class="overlay" id="overlay"></div>
+
+<main id="top"><div class="content">
+
+<section class="hero">
+  <span class="kicker">FRONT-END BASICS / 前端入门第一课</span>
+  <h1>HTML <span>完整学习笔记</span></h1>
+  <p>从「标签是什么」到「独立写出一个语义化页面」。左侧是可跳转的索引目录，每个知识点都配有代码片段和<strong>浏览器真实运行后的效果图</strong>——不是截图，是可以直接交互的 live 预览。</p>
+  <div class="badges">
+    <span class="badge"><b>15</b> 章系统知识</span>
+    <span class="badge"><b>25</b> 个可运行示例</span>
+    <span class="badge"><b>0</b> 外部依赖，双击即用</span>
+    <span class="badge"><b>索引</b>目录 + 搜索</span>
+    <span class="badge"><b>浅色 / 深色</b>双主题</span>
+  </div>
+  <div class="hero-actions">
+    <a class="btn primary" href="#ch-01">从第一章开始</a>
+    <a class="btn" href="#ch-14">直接看综合实战</a>
+    <a class="btn" href="#ch-15">速查表与自测</a>
+  </div>
+</section>
+
+<!-- ============ 01 ============ -->
+<section class="chapter" id="ch-01" data-group="基础篇">
+  <div class="chapter-head"><div class="chapter-num">01</div><div>
+    <h2 class="ch-title">认识 HTML：网页的骨架</h2>
+    <p class="ch-desc">概念、术语、浏览器渲染流程 —— 先把地图看清楚，再出发。</p>
+  </div></div>
+
+  <h3 class="sub" id="ch-01-1">1.1 HTML 是什么</h3>
+  <p>HTML（HyperText Markup Language，超文本标记语言）不是编程语言，而是<strong>描述网页结构与内容的标记语言</strong>。它用一对对标签把文字、图片、链接等包起来，告诉浏览器「这是一级标题」「那是一个按钮」。</p>
+  <ul class="plain">
+    <li><strong>超文本</strong>：不只是文字，还能通过链接跳到另一个文档。</li>
+    <li><strong>标记</strong>：用 <code class="inline">&lt;tag&gt;</code> 这类标签给内容打上语义标记。</li>
+    <li><strong>三大分工</strong>：HTML 管结构，CSS 管样式，JavaScript 管行为。三者配合才有现代网页。</li>
+  </ul>
+
+  <h3 class="sub" id="ch-01-2">1.2 浏览器拿到 HTML 之后做了什么</h3>
+  <div class="tw"><table class="t">
+    <tr><th>阶段</th><th>做了什么</th></tr>
+    <tr><td>1. 请求</td><td>输入网址，浏览器向服务器发起 HTTP 请求，拿到 <code class="inline">.html</code> 文本</td></tr>
+    <tr><td>2. 解析</td><td>从上到下解析标签，构建 <strong>DOM 树</strong>（Document Object Model）</td></tr>
+    <tr><td>3. 加载</td><td>遇到 <code class="inline">&lt;link&gt;</code> / <code class="inline">&lt;img&gt;</code> / <code class="inline">&lt;script&gt;</code> 继续请求 CSS、图片、脚本</td></tr>
+    <tr><td>4. 渲染</td><td>结合 CSS 生成渲染树，计算布局，绘制到屏幕</td></tr>
+    <tr><td>5. 交互</td><td>JavaScript 操作 DOM，响应用户点击、输入等事件</td></tr>
+  </table></div>
+  <div class="callout info"><span class="lb">补充说明</span><p>HTML 是<strong>容错</strong>的：写错标签浏览器也不会崩溃，会尽力猜测你的意图。但「能显示」不等于「写对了」——结构错误会影响 SEO、可访问性和后续维护。</p></div>
+
+  <h3 class="sub" id="ch-01-3">1.3 三个必须分清的术语</h3>
+  <div class="tw"><table class="t">
+    <tr><th>术语</th><th>含义</th><th>例子</th></tr>
+    <tr><td>标签 Tag</td><td>尖括号包住的关键字，分开始标签与结束标签</td><td><code class="inline">&lt;p&gt;</code> 与 <code class="inline">&lt;/p&gt;</code></td></tr>
+    <tr><td>元素 Element</td><td>开始标签 + 内容 + 结束标签的整体</td><td><code class="inline">&lt;p&gt;你好&lt;/p&gt;</code></td></tr>
+    <tr><td>属性 Attribute</td><td>写在开始标签里，提供附加信息，形式 <code class="inline">名="值"</code></td><td><code class="inline">&lt;a href="..."&gt;</code> 中的 <code class="inline">href</code></td></tr>
+  </table></div>
+  <p>还有一类<strong>空元素（void element）</strong>没有内容和结束标签，例如 <code class="inline">&lt;img&gt;</code>、<code class="inline">&lt;br&gt;</code>、<code class="inline">&lt;input&gt;</code>、<code class="inline">&lt;meta&gt;</code>、<code class="inline">&lt;link&gt;</code>、<code class="inline">&lt;hr&gt;</code>。HTML5 里写 <code class="inline">&lt;img ... /&gt;</code> 也可以，斜杠会被忽略。</p>
+
+  <div class="demo" data-title="示例 1-1 · 标签、元素与属性的直观对照">
+<script type="text/plain" class="demo-src">
+<h3>一个最小的网页片段</h3>
+<p>这是 <strong>段落元素</strong>，里面可以放 <em>强调文字</em> 和 <a href="#demo">链接属性</a>。</p>
+<p>下面这个换行是空元素：<br>它后面另起一行。</p>
+</script>
+  </div>
+  <div class="recap"><b>本节速记：</b>HTML = 结构；标签 → 元素 → 属性；空元素无结束标签；浏览器解析 HTML 生成 DOM 树再渲染。</div>
+</section>
+
+<!-- ============ 02 ============ -->
+<section class="chapter" id="ch-02" data-group="基础篇">
+  <div class="chapter-head"><div class="chapter-num">02</div><div>
+    <h2 class="ch-title">开发环境与第一个页面</h2>
+    <p class="ch-desc">DOCTYPE、html / head / body 骨架、注释、空白折叠与路径规则。</p>
+  </div></div>
+
+  <h3 class="sub" id="ch-02-1">2.1 最小可运行文档骨架</h3>
+  <p>一个规范的 HTML5 文档由 <code class="inline">&lt;!DOCTYPE html&gt;</code> 声明和 <code class="inline">&lt;html&gt;</code> 根元素组成，根元素内固定包含 <code class="inline">&lt;head&gt;</code>（元信息，不显示）与 <code class="inline">&lt;body&gt;</code>（可见内容）。</p>
+  <div class="demo" data-title="示例 2-1 · 完整的 HTML5 文档骨架（笔记中展示 body 部分的运行效果）">
+<script type="text/plain" class="demo-src">
+<h1>我的第一个网页</h1>
+<p>写在 body 里的内容才会出现在页面上。</p>
+<p>head 里的 title 会显示在浏览器标签页上，而不是页面里。</p>
+<hr>
+<small>提示：把本示例「新窗口运行」打开，按 F12 可以看到完整的 DOM 结构。</small>
+</script>
+  </div>
+  <div class="callout"><span class="lb">必写项</span><p><code class="inline">&lt;!DOCTYPE html&gt;</code> 必须放在第一行：它告诉浏览器使用<strong>标准模式</strong>渲染，省略会触发怪异模式，导致 CSS 盒模型表现异常。<code class="inline">&lt;meta charset="UTF-8"&gt;</code> 必须放在 head 最前面（前 1024 字节内），否则中文可能乱码。</p></div>
+
+  <h3 class="sub" id="ch-02-2">2.2 骨架逐行拆解</h3>
+  <div class="tw"><table class="t">
+    <tr><th>写法</th><th>作用</th></tr>
+    <tr><td><code class="inline">&lt;!DOCTYPE html&gt;</code></td><td>HTML5 文档声明，不是标签</td></tr>
+    <tr><td><code class="inline">&lt;html lang="zh-CN"&gt;</code></td><td>根元素；<code class="inline">lang</code> 声明语言，利于屏幕阅读器与搜索引擎</td></tr>
+    <tr><td><code class="inline">&lt;meta charset="UTF-8"&gt;</code></td><td>字符编码，中文必写</td></tr>
+    <tr><td><code class="inline">&lt;meta name="viewport"&gt;</code></td><td>移动端视口设置，响应式页面必写</td></tr>
+    <tr><td><code class="inline">&lt;title&gt;</code></td><td>标签页标题，也是搜索结果标题</td></tr>
+    <tr><td><code class="inline">&lt;body&gt;</code></td><td>所有用户可见内容</td></tr>
+  </table></div>
+  <p>配套工具：编辑器推荐 VS Code（装 Live Server 插件可热刷新）；浏览器按 <code class="inline">F12</code> 打开开发者工具，<code class="inline">Elements</code> 面板能看到实时 DOM。</p>
+
+  <h3 class="sub" id="ch-02-3">2.3 注释、空白折叠与路径</h3>
+  <p>注释写作 <code class="inline">&lt;!-- 注释内容 --&gt;</code>，不会显示在页面上，也不能嵌套。HTML 会把连续多个空格、换行、制表符<strong>折叠成一个空格</strong>；需要保留格式就用 <code class="inline">&lt;pre&gt;</code> 或 CSS 的 <code class="inline">white-space</code>。</p>
+  <div class="tw"><table class="t">
+    <tr><th>路径写法</th><th>含义</th><th>示例</th></tr>
+    <tr><td>同级相对路径</td><td>从当前文件所在目录找</td><td><code class="inline">src="logo.png"</code></td></tr>
+    <tr><td>下级相对路径</td><td>进入子目录</td><td><code class="inline">src="images/logo.png"</code></td></tr>
+    <tr><td>上级相对路径</td><td><code class="inline">../</code> 返回上一层</td><td><code class="inline">href="../index.html"</code></td></tr>
+    <tr><td>根相对路径</td><td>从站点根目录开始</td><td><code class="inline">src="/assets/logo.png"</code></td></tr>
+    <tr><td>绝对 URL</td><td>完整协议 + 域名</td><td><code class="inline">https://example.com/a.png</code></td></tr>
+  </table></div>
+  <div class="demo" data-title="示例 2-2 · 空白折叠与 pre 的对比">
+<script type="text/plain" class="demo-src">
+<p>普通段落里   连续很多空格
+和换行，最后   只会显示成一个空格。</p>
+<pre>预格式文本会保留
+    缩进和
+        换行。</pre>
+</script>
+  </div>
+  <div class="recap"><b>本节速记：</b>DOCTYPE 第一行 → html → head + body；charset 与 viewport 必写；注释不嵌套；空白会被折叠；路径分相对与绝对。</div>
+</section>
+
+<!-- ============ 03 ============ -->
+<section class="chapter" id="ch-03" data-group="基础篇">
+  <div class="chapter-head"><div class="chapter-num">03</div><div>
+    <h2 class="ch-title">文本与排版标签</h2>
+    <p class="ch-desc">标题、段落、强调、引用、代码，以及块级与行内的区别。</p>
+  </div></div>
+
+  <h3 class="sub" id="ch-03-1">3.1 常用文本标签速览</h3>
+  <div class="tw"><table class="t">
+    <tr><th>标签</th><th>语义</th><th>类型</th></tr>
+    <tr><td><code class="inline">&lt;h1&gt; ~ &lt;h6&gt;</code></td><td>一到六级标题，h1 一个页面建议只用一次</td><td>块级</td></tr>
+    <tr><td><code class="inline">&lt;p&gt;</code></td><td>段落，浏览器自动在上下留间距</td><td>块级</td></tr>
+    <tr><td><code class="inline">&lt;br&gt; &lt;hr&gt;</code></td><td>换行 / 主题分隔线（都是空元素）</td><td>—</td></tr>
+    <tr><td><code class="inline">&lt;strong&gt; &lt;em&gt;</code></td><td><strong>重要</strong> / <em>强调</em>，带语义，优于 b / i</td><td>行内</td></tr>
+    <tr><td><code class="inline">&lt;del&gt; &lt;ins&gt;</code></td><td>删除线 / 下划线（表示文档修订）</td><td>行内</td></tr>
+    <tr><td><code class="inline">&lt;sub&gt; &lt;sup&gt;</code></td><td>下标 / 上标</td><td>行内</td></tr>
+    <tr><td><code class="inline">&lt;blockquote&gt;</code></td><td>块引用，可配 <code class="inline">cite</code> 属性</td><td>块级</td></tr>
+    <tr><td><code class="inline">&lt;pre&gt; &lt;code&gt;</code></td><td>预格式 / 行内代码</td><td>块级 / 行内</td></tr>
+    <tr><td><code class="inline">&lt;div&gt; &lt;span&gt;</code></td><td>无语义容器：块级 / 行内，用于布局与样式钩子</td><td>块级 / 行内</td></tr>
+  </table></div>
+
+  <h3 class="sub" id="ch-03-2">3.2 块级元素 vs 行内元素</h3>
+  <p><strong>块级元素</strong>独占一行、可设宽高与上下外边距（如 <code class="inline">div</code>、<code class="inline">p</code>、<code class="inline">h1</code>、<code class="inline">ul</code>）；<strong>行内元素</strong>跟在文字流里、宽高由内容决定（如 <code class="inline">span</code>、<code class="inline">a</code>、<code class="inline">strong</code>）。还有 <code class="inline">img</code>、<code class="inline">input</code> 这类<strong>行内块</strong>：不换行但可设宽高。</p>
+  <div class="callout warn"><span class="lb">常见坑</span><p>不要为了「变大加粗」就滥用 <code class="inline">&lt;h1&gt;</code>，也不要用 <code class="inline">&lt;br&gt;&lt;br&gt;</code> 撑间距。视觉交给 CSS，语义交给 HTML。另外 <code class="inline">&lt;p&gt;</code> 里不能嵌 <code class="inline">&lt;div&gt;</code>，浏览器会自动把段落闭合。</p></div>
+
+  <div class="demo" data-title="示例 3-1 · 文本标签全家福（真实渲染效果）">
+<script type="text/plain" class="demo-src">
+<h1>一级标题 h1</h1>
+<h2>二级标题 h2</h2>
+<h3>三级标题 h3</h3>
+<p>这是一个段落，包含 <strong>重要文字</strong>、<em>强调文字</em>、
+<del>已删除内容</del>、<ins>新增内容</ins>、上标 x<sup>2</sup> 与下标 H<sub>2</sub>O。</p>
+<p>行内代码写作 <code>&lt;p&gt;&lt;/p&gt;</code>，下面是一段块引用：</p>
+<blockquote cite="https://example.com">「结构清晰，样式才有着力点。」</blockquote>
+<hr>
+<p><span style="background:#fff2ed;color:#e44d26;padding:2px 6px;border-radius:4px">span 行内容器</span>
+紧跟在同一行；<strong>div 则会另起一行</strong>。</p>
+<div style="background:#f2f6ff;border-left:3px solid #2b7fd4;padding:8px 12px">我是一个 div 块级容器</div>
+</script>
+  </div>
+  <div class="recap"><b>本节速记：</b>标题有层级、段落成块；强调优先 strong / em；样式用 CSS，结构用语义标签；块级换行、行内随文。</div>
+</section>
+
+<!-- ============ 04 ============ -->
+<section class="chapter" id="ch-04" data-group="基础篇">
+  <div class="chapter-head"><div class="chapter-num">04</div><div>
+    <h2 class="ch-title">链接与图片</h2>
+    <p class="ch-desc">a 的各类 href、锚点跳转、img 的 alt、figure 与响应式图片。</p>
+  </div></div>
+
+  <h3 class="sub" id="ch-04-1">4.1 超链接 a</h3>
+  <div class="tw"><table class="t">
+    <tr><th>写法</th><th>效果</th></tr>
+    <tr><td><code class="inline">href="page.html"</code></td><td>跳转到站内页面</td></tr>
+    <tr><td><code class="inline">href="https://..."</code></td><td>跳转外部站点</td></tr>
+    <tr><td><code class="inline">href="#ch-05"</code></td><td>跳到本页 <code class="inline">id="ch-05"</code> 的锚点</td></tr>
+    <tr><td><code class="inline">href="mailto:a@b.com"</code></td><td>唤起邮件客户端</td></tr>
+    <tr><td><code class="inline">href="tel:13800000000"</code></td><td>移动端拨号</td></tr>
+    <tr><td><code class="inline">href="a.pdf" download</code></td><td>下载而非打开</td></tr>
+    <tr><td><code class="inline">target="_blank"</code></td><td>新标签页打开，务必加 <code class="inline">rel="noopener"</code></td></tr>
+    <tr><td><code class="inline">title="说明"</code></td><td>鼠标悬停提示（不能替代 alt / 文字说明）</td></tr>
+  </table></div>
+  <div class="callout warn"><span class="lb">安全提示</span><p>使用 <code class="inline">target="_blank"</code> 时加上 <code class="inline">rel="noopener noreferrer"</code>，避免新页面通过 <code class="inline">window.opener</code> 反向操作原页面。</p></div>
+
+  <h3 class="sub" id="ch-04-2">4.2 图片 img 与 figure</h3>
+  <p><code class="inline">&lt;img src="..." alt="..."&gt;</code> 是空元素。<code class="inline">alt</code> 是<strong>必写</strong>属性：图片加载失败时显示替代文字，也是屏幕阅读器与搜索引擎理解图片的唯一依据。装饰性图片可写 <code class="inline">alt=""</code>。显式声明 <code class="inline">width</code> / <code class="inline">height</code> 能避免加载时的布局抖动（CLS）。</p>
+  <p>需要「图 + 说明」时用 <code class="inline">&lt;figure&gt;</code> 包住 <code class="inline">&lt;img&gt;</code> 和 <code class="inline">&lt;figcaption&gt;</code>；需要按屏幕密度/宽度换图时用 <code class="inline">&lt;picture&gt;</code> + <code class="inline">&lt;source&gt;</code> + <code class="inline">srcset</code>。</p>
+  <div class="demo" data-title="示例 4-1 · 链接、锚点、图片占位与图注">
+<script type="text/plain" class="demo-src">
+<p><a href="#part2">跳到本示例的第二段（锚点）</a> ｜
+<a href="mailto:hello@example.com">发邮件</a> ｜
+<a href="https://developer.mozilla.org" target="_blank" rel="noopener">MDN（新标签页）</a></p>
+<figure style="margin:14px 0;text-align:center">
+  <div style="height:96px;line-height:96px;border-radius:10px;background:linear-gradient(120deg,#ffe4d6,#ffd0bb);color:#b5401c;font-weight:700">
+    图片加载区 · &lt;img src="cover.png" alt="封面"&gt;
+  </div>
+  <figcaption style="color:#6c7686;font-size:13px;margin-top:6px">图 4-1：figure 与 figcaption 的组合效果</figcaption>
+</figure>
+<p id="part2">这里是锚点目标段落，点击上面的第一个链接会跳到这里。</p>
+</script>
+  </div>
+  <div class="demo" data-title="示例 4-2 · picture / srcset 响应式图片写法">
+<script type="text/plain" class="demo-src">
+<p>按屏幕宽度切换图片资源：</p>
+<pre>&lt;picture&gt;
+  &lt;source media="(min-width: 800px)" srcset="cover-large.jpg"&gt;
+  &lt;img src="cover-small.jpg" alt="课程封面" width="320"&gt;
+&lt;/picture&gt;</pre>
+<p>按像素密度切换：<code>srcset="pic.jpg 1x, pic@2x.jpg 2x"</code></p>
+<div style="border:1px dashed #e44d26;border-radius:8px;padding:10px 14px;background:#fff8f5;font-size:13px">
+  效果说明：宽屏加载 cover-large.jpg，窄屏加载 cover-small.jpg；<b>img 仍是必需的兜底</b>，alt 写在 img 上。
+</div>
+</script>
+  </div>
+  <div class="recap"><b>本节速记：</b>href 支持页面 / 锚点 / 邮件 / 电话 / 下载；_blank 要配 noopener；img 必写 alt，配 figure 更语义化。</div>
+</section>
+
+<!-- ============ 05 ============ -->
+<section class="chapter" id="ch-05" data-group="基础篇">
+  <div class="chapter-head"><div class="chapter-num">05</div><div>
+    <h2 class="ch-title">列表：无序、有序与描述列表</h2>
+    <p class="ch-desc">ul / ol / dl 的用法、常用属性与嵌套规则。</p>
+  </div></div>
+
+  <h3 class="sub" id="ch-05-1">5.1 三种列表</h3>
+  <div class="tw"><table class="t">
+    <tr><th>标签</th><th>用途</th><th>常用属性</th></tr>
+    <tr><td><code class="inline">&lt;ul&gt;&lt;li&gt;</code></td><td>无序列表，项目无先后顺序</td><td>CSS <code class="inline">list-style</code></td></tr>
+    <tr><td><code class="inline">&lt;ol&gt;&lt;li&gt;</code></td><td>有序列表，有步骤/排名含义</td><td><code class="inline">start</code>、<code class="inline">type</code>、<code class="inline">reversed</code></td></tr>
+    <tr><td><code class="inline">&lt;dl&gt;&lt;dt&gt;&lt;dd&gt;</code></td><td>描述列表：术语 + 解释</td><td>一个 dt 可对应多个 dd</td></tr>
+  </table></div>
+  <p><code class="inline">&lt;li&gt;</code> 里可以再嵌 <code class="inline">&lt;ul&gt;</code> / <code class="inline">&lt;ol&gt;</code> 形成多级列表，但<strong>必须嵌在 li 内部</strong>，不能直接放在 ul 下。列表项里也能放段落、链接、图片等任意内容。</p>
+
+  <div class="demo" data-title="示例 5-1 · 三种列表与嵌套的真实效果">
+<script type="text/plain" class="demo-src">
+<h4>无序列表（购物清单）</h4>
+<ul>
+  <li>笔记本</li>
+  <li>文具
+    <ul><li>签字笔</li><li>便利贴</li></ul>
+  </li>
+  <li>水杯</li>
+</ul>
+<h4>有序列表（从 3 开始、倒序）</h4>
+<ol start="3" reversed>
+  <li>第三步：写 HTML</li>
+  <li>第二步：画草图</li>
+  <li>第一步：想清楚需求</li>
+</ol>
+<h4>描述列表（术语表）</h4>
+<dl>
+  <dt>HTML</dt><dd>超文本标记语言，负责结构</dd>
+  <dt>CSS</dt><dd>层叠样式表，负责表现</dd>
+</dl>
+</script>
+  </div>
+  <div class="recap"><b>本节速记：</b>ul 无顺序、ol 有顺序、dl 是术语解释；嵌套列表只能放进 li 里；ol 支持 start / reversed / type。</div>
+</section>
+
+<!-- ============ 06 ============ -->
+<section class="chapter" id="ch-06" data-group="核心标签篇">
+  <div class="chapter-head"><div class="chapter-num">06</div><div>
+    <h2 class="ch-title">表格：结构与合并单元格</h2>
+    <p class="ch-desc">表格只用来展示「二维数据」，不要拿它做页面布局。</p>
+  </div></div>
+
+  <h3 class="sub" id="ch-06-1">6.1 表格的完整结构</h3>
+  <div class="tw"><table class="t">
+    <tr><th>标签</th><th>作用</th></tr>
+    <tr><td><code class="inline">&lt;table&gt;</code></td><td>表格容器</td></tr>
+    <tr><td><code class="inline">&lt;caption&gt;</code></td><td>表格标题，写在 table 内第一个位置</td></tr>
+    <tr><td><code class="inline">&lt;thead&gt; / &lt;tbody&gt; / &lt;tfoot&gt;</code></td><td>表头 / 表体 / 表脚，语义分组，便于长表格分页打印</td></tr>
+    <tr><td><code class="inline">&lt;tr&gt;</code></td><td>表格行（table row）</td></tr>
+    <tr><td><code class="inline">&lt;th&gt;</code></td><td>表头单元格，默认加粗居中；用 <code class="inline">scope="col|row"</code> 指明方向</td></tr>
+    <tr><td><code class="inline">&lt;td&gt;</code></td><td>普通数据单元格</td></tr>
+    <tr><td><code class="inline">&lt;colgroup&gt; / &lt;col&gt;</code></td><td>按列统一设置样式</td></tr>
+  </table></div>
+  <p>即使不写 <code class="inline">&lt;tbody&gt;</code>，浏览器也会自动补上。语义化分组让 CSS 选择器和屏幕阅读器更准确。</p>
+
+  <h3 class="sub" id="ch-06-2">6.2 colspan 与 rowspan</h3>
+  <p><code class="inline">colspan="2"</code> 表示横向占两列，<code class="inline">rowspan="2"</code> 表示纵向占两行。合并后要<strong>删掉被覆盖的单元格</strong>，否则表格会错位。</p>
+
+  <div class="demo" data-title="示例 6-1 · 带标题、表头与表脚的成绩表">
+<script type="text/plain" class="demo-src">
+<table>
+  <caption>2026 秋季学期 · 前端课程成绩</caption>
+  <thead><tr><th scope="col">姓名</th><th scope="col">HTML</th><th scope="col">CSS</th><th scope="col">总评</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">邓佳燕</th><td>95</td><td>90</td><td>优秀</td></tr>
+    <tr><th scope="row">同学 B</th><td>86</td><td>88</td><td>良好</td></tr>
+  </tbody>
+  <tfoot><tr><th scope="row">平均分</th><td>90.5</td><td>89</td><td>—</td></tr></tfoot>
+</table>
+</script>
+  </div>
+
+  <div class="demo" data-title="示例 6-2 · 合并单元格课程表">
+<script type="text/plain" class="demo-src">
+<table>
+  <caption>课表（演示 colspan / rowspan）</caption>
+  <tr><th>时间</th><th colspan="2">上午</th><th colspan="2">下午</th></tr>
+  <tr><th rowspan="2">周一</th><td>HTML</td><td>CSS</td><td>JS</td><td>自习</td></tr>
+  <tr><td>实验</td><td>实验</td><td>答疑</td><td>自习</td></tr>
+</table>
+</script>
+  </div>
+  <div class="callout warn"><span class="lb">注意</span><p>表格的默认边框、间距由浏览器决定，实际项目用 CSS 的 <code class="inline">border-collapse</code>、<code class="inline">padding</code> 控制。移动端常用外层 <code class="inline">overflow-x:auto</code> 的容器包裹表格以横向滚动。</p></div>
+  <div class="recap"><b>本节速记：</b>caption → thead / tbody / tfoot → tr → th / td；表头加 scope；合并单元格后删除多余格子；表格不做布局。</div>
+</section>
+
+<!-- ============ 07 ============ -->
+<section class="chapter" id="ch-07" data-group="核心标签篇">
+  <div class="chapter-head"><div class="chapter-num">07</div><div>
+    <h2 class="ch-title">表单：与用户对话的入口</h2>
+    <p class="ch-desc">form、input 全类型、label、校验属性与提交原理。</p>
+  </div></div>
+
+  <h3 class="sub" id="ch-07-1">7.1 form 的工作方式</h3>
+  <p>用户填写控件 → 点击提交 → 浏览器把带 <code class="inline">name</code> 的控件按 <code class="inline">name=value</code> 打包 → 按 <code class="inline">method</code> 发送到 <code class="inline">action</code> 指定的地址。<strong>没有 name 的控件不会被提交。</strong></p>
+  <div class="tw"><table class="t">
+    <tr><th>属性</th><th>说明</th></tr>
+    <tr><td><code class="inline">action</code></td><td>接收数据的 URL，留空表示提交到当前页</td></tr>
+    <tr><td><code class="inline">method="get"</code></td><td>数据拼在 URL 查询串里，适合搜索、筛选（不适合密码）</td></tr>
+    <tr><td><code class="inline">method="post"</code></td><td>数据放在请求体里，适合登录、写入操作</td></tr>
+    <tr><td><code class="inline">enctype</code></td><td>上传文件必须设为 <code class="inline">multipart/form-data</code></td></tr>
+    <tr><td><code class="inline">autocomplete / novalidate</code></td><td>自动填充 / 关闭原生校验</td></tr>
+  </table></div>
+
+  <h3 class="sub" id="ch-07-2">7.2 input 类型一览</h3>
+  <div class="tw"><table class="t">
+    <tr><th>type</th><th>用途</th><th>type</th><th>用途</th></tr>
+    <tr><td><code class="inline">text</code></td><td>单行文本（默认值）</td><td><code class="inline">password</code></td><td>密码，输入被遮蔽</td></tr>
+    <tr><td><code class="inline">email / url / tel</code></td><td>带格式校验与移动端键盘优化</td><td><code class="inline">number</code></td><td>数字，配 min / max / step</td></tr>
+    <tr><td><code class="inline">radio</code></td><td>单选，同组 name 必须相同</td><td><code class="inline">checkbox</code></td><td>多选，name 常用数组形式</td></tr>
+    <tr><td><code class="inline">date / time / datetime-local</code></td><td>原生日期时间选择器</td><td><code class="inline">month / week</code></td><td>月 / 周选择</td></tr>
+    <tr><td><code class="inline">range</code></td><td>滑块</td><td><code class="inline">color</code></td><td>取色器</td></tr>
+    <tr><td><code class="inline">file</code></td><td>文件上传，配 <code class="inline">multiple</code> / <code class="inline">accept</code></td><td><code class="inline">hidden</code></td><td>隐藏字段</td></tr>
+    <tr><td><code class="inline">search</code></td><td>搜索框</td><td><code class="inline">submit / reset / button</code></td><td>提交 / 重置 / 普通按钮</td></tr>
+  </table></div>
+
+  <h3 class="sub" id="ch-07-3">7.3 其它控件与 label</h3>
+  <p><code class="inline">&lt;label&gt;</code> 有两种关联写法：用 <code class="inline">for</code> 指向控件的 <code class="inline">id</code>，或直接把控件包在 label 里。关联后点击文字也能聚焦/勾选控件，对可访问性很关键。</p>
+  <ul class="plain">
+    <li><code class="inline">&lt;textarea rows cols&gt;</code>：多行文本；<code class="inline">&lt;select&gt; + &lt;option&gt; + &lt;optgroup&gt;</code>：下拉选择</li>
+    <li><code class="inline">&lt;fieldset&gt; + &lt;legend&gt;</code>：给一组控件加分组标题</li>
+    <li><code class="inline">&lt;datalist&gt; + list</code>：给输入框提供候选建议（仍可自由输入）</li>
+    <li><code class="inline">&lt;button type="submit|reset|button"&gt;</code>：比 input 按钮更灵活，可放图标</li>
+  </ul>
+
+  <h3 class="sub" id="ch-07-4">7.4 HTML5 原生校验</h3>
+  <div class="tw"><table class="t">
+    <tr><th>属性</th><th>作用</th></tr>
+    <tr><td><code class="inline">required</code></td><td>必填</td></tr>
+    <tr><td><code class="inline">placeholder</code></td><td>占位提示（不能替代 label）</td></tr>
+    <tr><td><code class="inline">pattern</code></td><td>正则校验，如 <code class="inline">pattern="[0-9]{11}"</code></td></tr>
+    <tr><td><code class="inline">min / max / minlength / maxlength</code></td><td>数值或长度范围</td></tr>
+    <tr><td><code class="inline">checked / selected / disabled / readonly</code></td><td>布尔属性：写上即生效</td></tr>
+    <tr><td><code class="inline">autofocus / autocomplete</code></td><td>自动聚焦 / 自动填充策略</td></tr>
+  </table></div>
+
+  <div class="demo" data-title="示例 7-1 · 一个可直接交互的注册表单">
+<script type="text/plain" class="demo-src">
+<form action="#" method="post" onsubmit="alert('演示：这里不会真的提交');return false">
+  <fieldset>
+    <legend>账号信息</legend>
+    <p><label for="u">用户名：</label>
+       <input id="u" name="username" type="text" placeholder="3-12 个字符" required minlength="3" maxlength="12"></p>
+    <p><label for="p">密码：</label>
+       <input id="p" name="password" type="password" required minlength="6"></p>
+    <p><label for="e">邮箱：</label>
+       <input id="e" name="email" type="email" placeholder="name@example.com" required></p>
+  </fieldset>
+  <fieldset>
+    <legend>偏好设置</legend>
+    <p>方向：
+      <label><input type="radio" name="track" value="fe" checked> 前端</label>
+      <label><input type="radio" name="track" value="be"> 后端</label></p>
+    <p><label><input type="checkbox" name="subscribe" checked> 接收学习提醒</label></p>
+    <p><label for="lv">掌握程度：</label>
+       <input id="lv" name="level" type="range" min="0" max="100" value="60"></p>
+    <p><label for="city">常用编辑器：</label>
+       <input id="city" name="editor" list="editors" placeholder="可输入或选择">
+       <datalist id="editors"><option value="VS Code"><option value="WebStorm"><option value="Sublime Text"></datalist></p>
+    <p><label for="bio">自我介绍：</label><br>
+       <textarea id="bio" name="bio" rows="2" cols="34" placeholder="一句话介绍自己"></textarea></p>
+  </fieldset>
+  <button type="submit">提交</button> <button type="reset">重置</button>
+</form>
+</script>
+  </div>
+
+  <div class="demo" data-title="示例 7-2 · 各类 input 与 select 的渲染对照">
+<script type="text/plain" class="demo-src">
+<p>日期：<input type="date">　颜色：<input type="color" value="#e44d26">　数字：<input type="number" min="1" max="9" value="3" style="width:70px"></p>
+<p>文件：<input type="file">　滑块：<input type="range" min="0" max="10" value="7"></p>
+<p>下拉：
+<select name="term">
+  <optgroup label="2026 年"><option>春季学期</option><option selected>秋季学期</option></optgroup>
+  <optgroup label="2027 年"><option>春季学期</option></optgroup>
+</select></p>
+<p>禁用：<input type="text" value="不可编辑" disabled>　只读：<input type="text" value="可复制不可改" readonly></p>
+</script>
+  </div>
+  <div class="callout"><span class="lb">提示</span><p>原生校验只是<strong>用户体验层</strong>，服务端必须重新校验所有数据。布尔属性写成 <code class="inline">required="false"</code> 依然是「必填」——只要属性存在就生效。</p></div>
+  <div class="recap"><b>本节速记：</b>name 决定提交什么，method 决定怎么发；label 必配；select / textarea / fieldset 各司其职；原生校验不能替代服务端校验。</div>
+</section>
+
+<!-- ============ 08 ============ -->
+<section class="chapter" id="ch-08" data-group="核心标签篇">
+  <div class="chapter-head"><div class="chapter-num">08</div><div>
+    <h2 class="ch-title">语义化与页面结构</h2>
+    <p class="ch-desc">HTML5 结构标签、SEO 与可访问性，写出「机器也读得懂」的页面。</p>
+  </div></div>
+
+  <h3 class="sub" id="ch-08-1">8.1 HTML5 结构标签地图</h3>
+  <div class="tw"><table class="t">
+    <tr><th>标签</th><th>含义</th></tr>
+    <tr><td><code class="inline">&lt;header&gt;</code></td><td>页面或区块的头部（logo、标题、导航）</td></tr>
+    <tr><td><code class="inline">&lt;nav&gt;</code></td><td>主导航链接集合</td></tr>
+    <tr><td><code class="inline">&lt;main&gt;</code></td><td>页面主内容，一个页面只能有一个</td></tr>
+    <tr><td><code class="inline">&lt;article&gt;</code></td><td>可独立分发的内容：文章、帖子、卡片</td></tr>
+    <tr><td><code class="inline">&lt;section&gt;</code></td><td>带主题的内容分组，通常有标题</td></tr>
+    <tr><td><code class="inline">&lt;aside&gt;</code></td><td>侧边栏、与主体相关的补充信息</td></tr>
+    <tr><td><code class="inline">&lt;footer&gt;</code></td><td>页脚：版权、联系方式、相关链接</td></tr>
+    <tr><td><code class="inline">&lt;figure&gt; / &lt;figcaption&gt;</code></td><td>独立的图、表、代码块及其说明</td></tr>
+    <tr><td><code class="inline">&lt;time datetime=""&gt;</code></td><td>机器可读的时间</td></tr>
+    <tr><td><code class="inline">&lt;mark&gt; / &lt;details&gt; / &lt;summary&gt;</code></td><td>高亮 / 可折叠详情</td></tr>
+  </table></div>
+
+  <h3 class="sub" id="ch-08-2">8.2 语义化的收益</h3>
+  <ul class="plain">
+    <li><strong>可访问性</strong>：屏幕阅读器可以「跳到主内容」「列出所有导航」。</li>
+    <li><strong>SEO</strong>：搜索引擎更容易判断哪部分是正文、标题层级是否正确。</li>
+    <li><strong>可维护性</strong>：<code class="inline">&lt;nav&gt;</code> 一眼就懂，比 <code class="inline">&lt;div class="nav"&gt;</code> 少一层心智负担。</li>
+    <li><strong>健壮性</strong>：样式丢失时页面仍保有清晰的结构与阅读顺序。</li>
+  </ul>
+  <div class="callout warn"><span class="lb">常见误区</span><p>语义化不等于「把所有 div 换掉」：纯布局容器继续用 div；<code class="inline">&lt;section&gt;</code> 应当有标题，只是想加样式时用 div；标题层级要连续，别从 h1 直接跳到 h4。</p></div>
+
+  <div class="demo" data-title="示例 8-1 · 语义化页面骨架（各区域已用颜色标注）">
+<script type="text/plain" class="demo-src">
+<header style="background:#ffe8de;border:1px solid #e44d26;border-radius:8px;padding:8px 12px;margin-bottom:8px">
+  <b>&lt;header&gt;</b> 站点标题　
+  <nav style="display:inline;color:#e44d26">&lt;nav&gt; 首页 ｜ 笔记 ｜ 关于</nav>
+</header>
+<div style="display:flex;gap:8px">
+  <main style="flex:3;background:#eef5ff;border:1px solid #2b7fd4;border-radius:8px;padding:8px 12px">
+    <b>&lt;main&gt;</b>
+    <section style="background:#fff;border-radius:6px;padding:6px 10px;margin:6px 0">
+      <b>&lt;section&gt;</b> 章节标题
+      <article style="background:#f7f9fc;border-left:3px solid #2b7fd4;padding:6px 10px;margin-top:6px">
+        <b>&lt;article&gt;</b> 一篇可独立分发的文章内容
+      </article>
+    </section>
+  </main>
+  <aside style="flex:1;background:#fff6d9;border:1px solid #d99b16;border-radius:8px;padding:8px 12px">
+    <b>&lt;aside&gt;</b><br>侧边补充
+  </aside>
+</div>
+<footer style="background:#eef0f4;border-radius:8px;padding:8px 12px;margin-top:8px;color:#555">
+  <b>&lt;footer&gt;</b> 版权信息 · <time datetime="2026-11-18">2026 年 11 月 18 日</time>
+</footer>
+</script>
+  </div>
+
+  <div class="demo" data-title="示例 8-2 · details / summary 与 mark 的真实效果">
+<script type="text/plain" class="demo-src">
+<p>用 <mark>mark</mark> 高亮关键词，用 <code>time</code> 标记日期：<time datetime="2026-11-18">2026-11-18</time>。</p>
+<details open>
+  <summary>点击展开 / 收起：什么是 DOM？</summary>
+  <p>DOM 是浏览器把 HTML 解析成的树状对象模型，JavaScript 通过它读写页面结构。</p>
+</details>
+<details>
+  <summary>再看一个折叠项</summary>
+  <p>这是第二项的内容，默认收起。</p>
+</details>
+</script>
+  </div>
+  <div class="recap"><b>本节速记：</b>header / nav / main / article / section / aside / footer 各就各位；main 只能一个；语义化服务 a11y 与 SEO；纯布局仍用 div。</div>
+</section>
+
+<!-- ============ 09 ============ -->
+<section class="chapter" id="ch-09" data-group="核心标签篇">
+  <div class="chapter-head"><div class="chapter-num">09</div><div>
+    <h2 class="ch-title">多媒体与嵌入内容</h2>
+    <p class="ch-desc">audio / video、内联 SVG、canvas、iframe 与响应式嵌入。</p>
+  </div></div>
+
+  <h3 class="sub" id="ch-09-1">9.1 音视频标签</h3>
+  <div class="tw"><table class="t">
+    <tr><th>标签 / 属性</th><th>说明</th></tr>
+    <tr><td><code class="inline">&lt;video src controls&gt;</code></td><td>视频播放器；<code class="inline">poster</code> 封面、<code class="inline">width/height</code> 尺寸</td></tr>
+    <tr><td><code class="inline">&lt;audio src controls&gt;</code></td><td>音频播放器</td></tr>
+    <tr><td><code class="inline">&lt;source src type&gt;</code></td><td>提供多种格式，浏览器挑第一个能播的</td></tr>
+    <tr><td><code class="inline">&lt;track kind="subtitles"&gt;</code></td><td>字幕文件（WebVTT），配 <code class="inline">srclang</code> / <code class="inline">label</code></td></tr>
+    <tr><td><code class="inline">autoplay / loop / muted / preload</code></td><td>自动播放 / 循环 / 静音 / 预加载策略</td></tr>
+  </table></div>
+  <div class="callout info"><span class="lb">补充</span><p>主流浏览器对自动播放有限制：带声音的 <code class="inline">autoplay</code> 通常被拦截，需同时加 <code class="inline">muted</code> 或由用户手势触发。</p></div>
+
+  <h3 class="sub" id="ch-09-2">9.2 SVG、Canvas 与 iframe</h3>
+  <ul class="plain">
+    <li><strong>内联 SVG</strong>：矢量、可用 CSS 控制、可缩放不失真，适合图标与图表；直接写在 HTML 里。</li>
+    <li><strong>canvas</strong>：位图画布，靠 JavaScript 逐帧绘制，适合游戏与图像处理；标签本身只是占位。</li>
+    <li><strong>iframe</strong>：嵌入另一个页面。务必写 <code class="inline">title</code> 说明用途；用 <code class="inline">sandbox</code> 限制权限；用 <code class="inline">loading="lazy"</code> 延迟加载。</li>
+    <li><strong>响应式嵌入</strong>：外层容器设 <code class="inline">aspect-ratio</code> 或 <code class="inline">padding-top</code>，内部 iframe/video 设 <code class="inline">width:100%;height:100%</code>。</li>
+  </ul>
+
+  <div class="demo" data-title="示例 9-1 · 内联 SVG 图形（矢量、可无损缩放）">
+<script type="text/plain" class="demo-src">
+<p>下面这几块图形是 <strong>内联 SVG</strong>，不是图片文件：</p>
+<svg width="100%" height="86" viewBox="0 0 420 86" style="background:#f7f9fc;border-radius:8px;border:1px solid #e2e7ee">
+  <rect x="14" y="18" width="70" height="50" rx="8" fill="#e44d26"/>
+  <circle cx="140" cy="43" r="26" fill="#f16529" opacity=".85"/>
+  <polygon points="205,68 232,18 259,68" fill="#2b7fd4"/>
+  <path d="M285 60 C305 10, 330 80, 360 26" stroke="#198754" stroke-width="4" fill="none"/>
+  <text x="375" y="49" font-size="13" fill="#6c7686">SVG</text>
+</svg>
+</script>
+  </div>
+
+  <div class="demo" data-title="示例 9-2 · 视频 / 音频标签的播放器外观与占位说明">
+<script type="text/plain" class="demo-src">
+<p><b>&lt;video controls poster="cover.jpg" width="320"&gt;</b> 的占位效果：</p>
+<div style="width:320px;max-width:100%;height:120px;border-radius:8px;background:linear-gradient(135deg,#2b3442,#4a5a70);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">
+  ▶ 视频封面 / poster
+</div>
+<p><b>&lt;audio controls src="bgm.mp3"&gt;</b> 的占位效果：</p>
+<div style="width:320px;max-width:100%;border:1px solid #dfe4ea;border-radius:20px;padding:6px 12px;background:#f7f9fc;font-size:12px;color:#555">
+  ▶ ────────────── 00:00 / 03:20
+</div>
+<p><small>真实项目里请换成 video / audio 标签并给出可用的媒体文件地址；此处用占位块是为了离线也能看到布局效果。</small></p>
+</script>
+  </div>
+  <div class="recap"><b>本节速记：</b>video / audio 配 source 提供多格式；SVG 矢量、canvas 位图；iframe 必写 title 并考虑 sandbox 与懒加载。</div>
+</section>
+
+<!-- ============ 10 ============ -->
+<section class="chapter" id="ch-10" data-group="核心标签篇">
+  <div class="chapter-head"><div class="chapter-num">10</div><div>
+    <h2 class="ch-title">head 元信息与资源引入</h2>
+    <p class="ch-desc">页面「看不见但很重要」的部分：编码、视口、SEO、图标与脚本加载策略。</p>
+  </div></div>
+
+  <h3 class="sub" id="ch-10-1">10.1 head 里的常驻元素</h3>
+  <div class="tw"><table class="t">
+    <tr><th>元素</th><th>作用</th></tr>
+    <tr><td><code class="inline">&lt;title&gt;</code></td><td>标签页标题、收藏夹名称、搜索结果标题</td></tr>
+    <tr><td><code class="inline">&lt;meta charset="UTF-8"&gt;</code></td><td>字符编码，必须最靠前</td></tr>
+    <tr><td><code class="inline">&lt;meta name="viewport"&gt;</code></td><td><code class="inline">width=device-width, initial-scale=1.0</code></td></tr>
+    <tr><td><code class="inline">&lt;meta name="description"&gt;</code></td><td>搜索结果摘要，约 150 字以内</td></tr>
+    <tr><td><code class="inline">&lt;link rel="stylesheet" href&gt;</code></td><td>引入外部 CSS</td></tr>
+    <tr><td><code class="inline">&lt;link rel="icon" href&gt;</code></td><td>站点图标 favicon</td></tr>
+    <tr><td><code class="inline">&lt;style&gt; / &lt;script&gt;</code></td><td>内联样式 / 脚本</td></tr>
+    <tr><td><code class="inline">&lt;base href target&gt;</code></td><td>统一设置相对 URL 的基准（谨慎使用）</td></tr>
+  </table></div>
+
+  <h4>一份可直接复制的 head 模板</h4>
+  <pre class="code"><code>&lt;!-- head 内建议顺序（静态代码块，无需运行效果）--&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+&lt;title&gt;页面标题&lt;/title&gt;
+&lt;meta name="description" content="一句话描述本页内容"&gt;
+&lt;link rel="icon" href="favicon.ico"&gt;
+&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;script src="app.js" defer&gt;&lt;/script&gt;</code></pre>
+
+  <h3 class="sub" id="ch-10-2">10.2 defer 与 async 的区别</h3>
+  <div class="tw"><table class="t">
+    <tr><th>写法</th><th>下载</th><th>执行时机</th><th>顺序</th></tr>
+    <tr><td>普通 <code class="inline">&lt;script src&gt;</code></td><td>阻塞 HTML 解析</td><td>下载完立即执行</td><td>按书写顺序</td></tr>
+    <tr><td><code class="inline">defer</code></td><td>并行下载</td><td>HTML 解析完、DOMContentLoaded 前</td><td>保证顺序</td></tr>
+    <tr><td><code class="inline">async</code></td><td>并行下载</td><td>下载完立刻执行，可能打断解析</td><td>不保证顺序</td></tr>
+  </table></div>
+  <p>页面脚本推荐 <code class="inline">defer</code>；第三方统计类、互不依赖的脚本适合 <code class="inline">async</code>。</p>
+
+  <h3 class="sub" id="ch-10-3">10.3 社交分享与 SEO 元信息</h3>
+  <p>Open Graph 协议让链接在微信、QQ、Twitter 等平台展示标题、摘要和封面，常用 <code class="inline">&lt;meta property="og:title"&gt;</code>、<code class="inline">og:description</code>、<code class="inline">og:image</code>、<code class="inline">og:url</code>。此外 <code class="inline">&lt;link rel="canonical"&gt;</code> 指定权威 URL，避免重复内容分散权重。</p>
+
+  <div class="demo" data-title="示例 10-1 · head 元素速查清单（渲染效果）">
+<script type="text/plain" class="demo-src">
+<h3>head 里都放了什么？</h3>
+<table>
+  <tr><th>分类</th><th>关键元素</th></tr>
+  <tr><td>基础</td><td>charset、viewport、title</td></tr>
+  <tr><td>资源</td><td>link:stylesheet、link:icon、script defer</td></tr>
+  <tr><td>SEO</td><td>description、robots、canonical</td></tr>
+  <tr><td>分享</td><td>og:title、og:image、og:description</td></tr>
+</table>
+<p><small>提示：head 内的元素不会显示在页面主体中，本示例用表格把清单可视化。</small></p>
+</script>
+  </div>
+  <div class="recap"><b>本节速记：</b>charset 最前、viewport 必写；description 影响搜索摘要；脚本优先 defer；分享卡片靠 Open Graph。</div>
+</section>
+
+<!-- ============ 11 ============ -->
+<section class="chapter" id="ch-11" data-group="进阶与规范篇">
+  <div class="chapter-head"><div class="chapter-num">11</div><div>
+    <h2 class="ch-title">全局属性、字符实体与编码</h2>
+    <p class="ch-desc">所有标签都能用的属性、特殊字符怎么显示，以及乱码的根源。</p>
+  </div></div>
+
+  <h3 class="sub" id="ch-11-1">11.1 全局属性</h3>
+  <div class="tw"><table class="t">
+    <tr><th>属性</th><th>作用</th></tr>
+    <tr><td><code class="inline">id</code></td><td>文档内唯一标识，用于锚点、CSS、JS 定位</td></tr>
+    <tr><td><code class="inline">class</code></td><td>可复用的类名，多个值用空格分隔</td></tr>
+    <tr><td><code class="inline">style</code></td><td>行内样式（优先级高，尽量少用）</td></tr>
+    <tr><td><code class="inline">title</code></td><td>悬停提示文本</td></tr>
+    <tr><td><code class="inline">lang / dir</code></td><td>语言 / 文字方向（ltr、rtl）</td></tr>
+    <tr><td><code class="inline">data-*</code></td><td>自定义数据属性，JS 通过 <code class="inline">dataset</code> 读取</td></tr>
+    <tr><td><code class="inline">hidden</code></td><td>布尔属性，隐藏元素（等于 display:none）</td></tr>
+    <tr><td><code class="inline">tabindex</code></td><td>键盘 Tab 顺序；0 可聚焦、-1 仅脚本聚焦，正数不推荐</td></tr>
+    <tr><td><code class="inline">contenteditable</code></td><td>让元素内容可编辑</td></tr>
+    <tr><td><code class="inline">draggable / spellcheck / translate</code></td><td>拖拽 / 拼写检查 / 是否参与翻译</td></tr>
+    <tr><td><code class="inline">aria-*</code> / <code class="inline">role</code></td><td>为辅助技术补充语义（WAI-ARIA）</td></tr>
+  </table></div>
+
+  <h3 class="sub" id="ch-11-2">11.2 字符实体</h3>
+  <p>HTML 中 <code class="inline">&lt;</code>、<code class="inline">&gt;</code>、<code class="inline">&amp;</code> 有特殊含义，要显示它们本身必须写<strong>字符实体</strong>：<code class="inline">&amp;lt;</code>、<code class="inline">&amp;gt;</code>、<code class="inline">&amp;amp;</code>。实体可以用名称或数字（十进制 <code class="inline">&amp;#169;</code> / 十六进制 <code class="inline">&amp;#xA9;</code>）。</p>
+  <div class="tw"><table class="t">
+    <tr><th>显示</th><th>实体</th><th>说明</th></tr>
+    <tr><td>空格</td><td><code class="inline">&amp;nbsp;</code></td><td>不换行空格，可用来阻止空白折叠</td></tr>
+    <tr><td>&lt; &gt;</td><td><code class="inline">&amp;lt; &amp;gt;</code></td><td>小于号 / 大于号</td></tr>
+    <tr><td>&amp;</td><td><code class="inline">&amp;amp;</code></td><td>和号</td></tr>
+    <tr><td>" '</td><td><code class="inline">&amp;quot; &amp;#39;</code></td><td>双引号 / 单引号</td></tr>
+    <tr><td>© ® ™</td><td><code class="inline">&amp;copy; &amp;reg; &amp;trade;</code></td><td>版权 / 注册 / 商标</td></tr>
+  </table></div>
+
+  <div class="demo" data-title="示例 11-1 · 字符实体的渲染对照">
+<script type="text/plain" class="demo-src">
+<p>标签原文： &lt;h1&gt;标题&lt;/h1&gt;</p>
+<p>特殊符号： &amp;　&quot;　&copy;　&reg;　&trade;　&times;　&divide;</p>
+<p>不换行空格：A&nbsp;&nbsp;&nbsp;B（中间的三个空格不会被折叠）</p>
+<p>十六进制实体：&#x2764; &#x1F680;（爱心与火箭）</p>
+</script>
+  </div>
+
+  <div class="demo" data-title="示例 11-2 · 全局属性的可见效果">
+<script type="text/plain" class="demo-src">
+<p title="我是 title 属性的悬停提示">把鼠标停在这行文字上，会看到 title 提示。</p>
+<p><span hidden>这行写了 hidden，你看不见我。</span>上一句被隐藏了。</p>
+<p contenteditable="true" style="border:1px dashed #e44d26;border-radius:6px;padding:8px 12px;background:#fff8f5">
+  这个段落有 contenteditable="true"，点一下就能直接编辑文字。</p>
+<p><span data-chapter="11" data-role="demo" style="background:#eef5ff;padding:3px 8px;border-radius:5px">
+  我带着 data-* 自定义数据，供 JavaScript 读取</span></p>
+<p><a href="#ch-12" tabindex="0">带 tabindex 的链接</a>（Tab 键可聚焦）</p>
+</script>
+  </div>
+  <div class="callout warn"><span class="lb">乱码排查</span><p>中文变「锟斤拷」或问号，几乎都是<strong>文件保存编码</strong>与 <code class="inline">&lt;meta charset&gt;</code> 声明不一致。统一用 UTF-8 保存文件，并把 charset 放在 head 最前面即可。</p></div>
+  <div class="recap"><b>本节速记：</b>id 唯一、class 可复用；data-* 存自定义数据；特殊字符用实体；编码统一 UTF-8。</div>
+</section>
+
+<!-- ============ 12 ============ -->
+<section class="chapter" id="ch-12" data-group="进阶与规范篇">
+  <div class="chapter-head"><div class="chapter-num">12</div><div>
+    <h2 class="ch-title">HTML5 新特性与相关 Web API</h2>
+    <p class="ch-desc">新标签、新控件、原生弹窗，以及 HTML 常一起使用的浏览器能力。</p>
+  </div></div>
+
+  <h3 class="sub" id="ch-12-1">12.1 HTML5 带来了什么</h3>
+  <div class="tw"><table class="t">
+    <tr><th>类别</th><th>新增内容</th></tr>
+    <tr><td>语义标签</td><td>header / nav / main / article / section / aside / footer / figure / time / mark</td></tr>
+    <tr><td>表单增强</td><td>email / url / date / range / color / number、required / pattern / placeholder、datalist</td></tr>
+    <tr><td>多媒体</td><td>audio / video / track / source、canvas、内联 SVG</td></tr>
+    <tr><td>新元素</td><td>details / summary、dialog、progress / meter / output、template、picture</td></tr>
+    <tr><td>JS API</td><td>Web Storage、拖放、地理定位、History、Web Workers、Custom Elements</td></tr>
+  </table></div>
+
+  <h3 class="sub" id="ch-12-2">12.2 原生进度、度量与弹窗</h3>
+  <ul class="plain">
+    <li><code class="inline">&lt;progress value="60" max="100"&gt;</code>：任务完成进度。</li>
+    <li><code class="inline">&lt;meter value="7" min="0" max="10"&gt;</code>：已知范围内的度量值（如评分、磁盘用量）。</li>
+    <li><code class="inline">&lt;output&gt;</code>：表示计算或用户操作的结果。</li>
+    <li><code class="inline">&lt;dialog&gt;</code>：原生模态框，用 JS 的 <code class="inline">showModal()</code> / <code class="inline">close()</code> 控制。</li>
+    <li><code class="inline">&lt;template&gt;</code>： inert 模板片段，内容不会被渲染，供 JS 克隆复用。</li>
+    <li><code class="inline">&lt;picture&gt; + srcset / sizes</code>：按视口或像素密度选择最合适的图片（响应式图片）。</li>
+  </ul>
+
+  <div class="demo" data-title="示例 12-1 · progress / meter / output 的真实渲染">
+<script type="text/plain" class="demo-src">
+<p>课程完成度：<progress value="62" max="100"></progress> 62%</p>
+<p>磁盘使用：<meter value="7" min="0" max="10" low="3" high="8" optimum="2"></meter> 7 / 10</p>
+<p>计算结果：<output name="result">42</output>（output 表示结果输出）</p>
+<p>响应式图片写法提示：<code>&lt;picture&gt;&lt;source media="(min-width:800px)" srcset="big.jpg"&gt;&lt;img src="small.jpg" alt="..."&gt;&lt;/picture&gt;</code></p>
+</script>
+  </div>
+
+  <div class="demo" data-title="示例 12-2 · 原生 dialog 弹窗（可点击体验）">
+<script type="text/plain" class="demo-src">
+<button onclick="document.getElementById('myDlg').showModal()">打开原生对话框</button>
+<dialog id="myDlg" style="border:1px solid #dfe4ea;border-radius:10px;padding:18px 22px;box-shadow:0 8px 30px rgba(0,0,0,.18)">
+  <p><b>这是一个 &lt;dialog&gt; 元素</b></p>
+  <p>由浏览器原生提供模态能力，无需额外 UI 库。</p>
+  <button onclick="document.getElementById('myDlg').close()">关闭</button>
+</dialog>
+<p><small>点击按钮试试；showModal() 会自动带遮罩并支持 Esc 关闭。</small></p>
+</script>
+  </div>
+
+  <h3 class="sub" id="ch-12-3">12.3 常与 HTML 一起用的 Web API</h3>
+  <div class="demo" data-title="示例 12-3 · HTML5 相关 API 速览">
+<script type="text/plain" class="demo-src">
+<table>
+  <tr><th>API</th><th>典型用途</th><th>一句话说明</th></tr>
+  <tr><td>localStorage</td><td>记住主题、草稿</td><td>持久化键值存储，约 5MB</td></tr>
+  <tr><td>sessionStorage</td><td>单次会话状态</td><td>关闭标签页即清除</td></tr>
+  <tr><td>Drag &amp; Drop</td><td>拖拽排序、上传</td><td>draggable 属性 + drag 事件</td></tr>
+  <tr><td>Geolocation</td><td>定位、附近服务</td><td>需用户授权且通常要求 HTTPS</td></tr>
+  <tr><td>History API</td><td>单页应用路由</td><td>pushState 改 URL 不刷新</td></tr>
+  <tr><td>Custom Elements</td><td>自定义组件</td><td>Web Components 的核心</td></tr>
+</table>
+<p><small>这些能力由 JavaScript 调用，HTML 负责提供结构与触发入口。</small></p>
+</script>
+  </div>
+  <div class="recap"><b>本节速记：</b>progress 表进度、meter 表度量；dialog 提供原生模态；template 存模板；picture 做响应式图片；Storage / History 等交给 JS。</div>
+</section>
+
+<!-- ============ 13 ============ -->
+<section class="chapter" id="ch-13" data-group="进阶与规范篇">
+  <div class="chapter-head"><div class="chapter-num">13</div><div>
+    <h2 class="ch-title">可访问性、编码规范与排错</h2>
+    <p class="ch-desc">让页面对所有人可用，也让自己半年后还读得懂。</p>
+  </div></div>
+
+  <h3 class="sub" id="ch-13-1">13.1 可访问性（a11y）清单</h3>
+  <ul class="plain">
+    <li>每张有意义的图片都写清 <code class="inline">alt</code>，纯装饰图写 <code class="inline">alt=""</code>。</li>
+    <li>每个表单控件都有关联的 <code class="inline">&lt;label&gt;</code>；错误提示用文字而非仅靠颜色。</li>
+    <li>用语义标签表达结构，保持标题层级连续；导航区包 <code class="inline">&lt;nav&gt;</code>。</li>
+    <li>保证键盘可达：链接/按钮天然可 Tab，自定义控件才补 <code class="inline">tabindex</code> 与键盘事件。</li>
+    <li>文字与背景有足够对比度；不要只用颜色传达状态。</li>
+    <li>需要时用 <code class="inline">role</code> 与 <code class="inline">aria-label</code> / <code class="inline">aria-describedby</code> 补充语义，但<strong>优先使用原生标签</strong>。</li>
+    <li>给 iframe 写 <code class="inline">title</code>，给 video 配 <code class="inline">&lt;track&gt;</code> 字幕。</li>
+  </ul>
+
+  <h3 class="sub" id="ch-13-2">13.2 编码规范</h3>
+  <div class="tw"><table class="t">
+    <tr><th>建议</th><th>反例 → 正例</th></tr>
+    <tr><td>标签名、属性名小写</td><td><code class="inline">&lt;DIV CLASS="A"&gt;</code> → <code class="inline">&lt;div class="a"&gt;</code></td></tr>
+    <tr><td>属性值统一双引号</td><td><code class="inline">href=a.html</code> → <code class="inline">href="a.html"</code></td></tr>
+    <tr><td>成对标签必须闭合</td><td><code class="inline">&lt;p&gt;文字</code> → <code class="inline">&lt;p&gt;文字&lt;/p&gt;</code></td></tr>
+    <tr><td>缩进 2 空格，嵌套有层次</td><td>同级元素随意换行</td></tr>
+    <tr><td>id / class 见名知意</td><td><code class="inline">a1</code> → <code class="inline">user-card</code></td></tr>
+    <tr><td>结构、样式、脚本分离</td><td>满屏 <code class="inline">style=""</code> → 外部 CSS</td></tr>
+  </table></div>
+
+  <div class="demo" data-title="示例 13-1 · 「不推荐」与「推荐」写法对照">
+<script type="text/plain" class="demo-src">
+<div style="display:flex;gap:12px;flex-wrap:wrap">
+  <div style="flex:1;min-width:220px;border:1px solid #f0b6b6;background:#fff5f5;border-radius:8px;padding:10px 14px">
+    <b style="color:#c33d3d">不推荐</b>
+    <p><code>&lt;div class="btn" onclick="go()"&gt;提交&lt;/div&gt;</code></p>
+    <p><code>&lt;img src="a.png"&gt;</code></p>
+    <p><small>无语义、无 alt、键盘不可达、样式语义混在一起。</small></p>
+  </div>
+  <div style="flex:1;min-width:220px;border:1px solid #a9d8bb;background:#f3fbf6;border-radius:8px;padding:10px 14px">
+    <b style="color:#198754">推荐</b>
+    <p><code>&lt;button type="submit"&gt;提交&lt;/button&gt;</code></p>
+    <p><code>&lt;img src="a.png" alt="课程封面" width="320"&gt;</code></p>
+    <p><small>语义明确、可聚焦、可访问、样式交给 CSS。</small></p>
+  </div>
+</div>
+</script>
+  </div>
+
+  <h3 class="sub" id="ch-13-3">13.3 常见错误与排错工具</h3>
+  <div class="tw"><table class="t">
+    <tr><th>症状</th><th>常见原因</th></tr>
+    <tr><td>中文乱码</td><td>文件编码与 charset 不一致</td></tr>
+    <tr><td>图片裂开</td><td>src 路径写错、大小写不匹配（服务器区分大小写）</td></tr>
+    <tr><td>样式不生效</td><td>link 路径错、选择器权重不够、被行内样式覆盖</td></tr>
+    <tr><td>表单没提交数据</td><td>控件缺少 <code class="inline">name</code> 或被 <code class="inline">disabled</code></td></tr>
+    <tr><td>布局突然错位</td><td>标签没闭合、p 里嵌 div、表格 colspan 算错</td></tr>
+    <tr><td>移动端字很小</td><td>缺少 viewport meta</td></tr>
+  </table></div>
+  <p>排错三板斧：<strong>F12 开发者工具</strong>看 Elements 与 Console、<strong>W3C Markup Validator</strong> 校验标签、<strong>Lighthouse / axe</strong> 检查可访问性与 SEO。</p>
+  <div class="demo" data-title="示例 13-2 · 上线前的自检清单">
+<script type="text/plain" class="demo-src">
+<h4>发布前 8 项检查</h4>
+<ol>
+  <li>DOCTYPE、lang、charset、viewport 齐全</li>
+  <li>title 与 description 已填写</li>
+  <li>所有 img 都有 alt，所有 iframe 都有 title</li>
+  <li>所有表单控件都有 label 与 name</li>
+  <li>标题层级连续，只有一个 main</li>
+  <li>链接无空 href，外链加 rel="noopener"</li>
+  <li>通过 W3C 校验，无未闭合标签</li>
+  <li>用键盘 Tab 走一遍，焦点顺序正常</li>
+</ol>
+</script>
+  </div>
+  <div class="recap"><b>本节速记：</b>alt / label / 语义 / 键盘可达是 a11y 四件套；命名与缩进统一；乱码查编码、裂图查路径、不提交查 name。</div>
+</section>
+
+<!-- ============ 14 ============ -->
+<section class="chapter" id="ch-14" data-group="实战篇">
+  <div class="chapter-head"><div class="chapter-num">14</div><div>
+    <h2 class="ch-title">综合实战：一个完整的个人主页</h2>
+    <p class="ch-desc">把前 13 章的知识串起来：语义结构、列表、表格、表单、figure、锚点一次用齐。</p>
+  </div></div>
+
+  <h3 class="sub" id="ch-14-1">14.1 先规划结构，再写代码</h3>
+  <p>动手前先画草图：<code class="inline">header</code>（站点名 + <code class="inline">nav</code> 锚点导航）→ <code class="inline">main</code> 里三个 <code class="inline">section</code>（关于我 / 技能表格 / 留言表单）→ 侧边 <code class="inline">aside</code>（学习清单）→ <code class="inline">footer</code>。结构清楚了，HTML 基本就是「照着填」。</p>
+
+  <h3 class="sub" id="ch-14-2">14.2 完整示例（下方是真实运行效果）</h3>
+  <div class="demo" data-title="示例 14-1 · 综合实战：个人主页（可直接点击交互）">
+<script type="text/plain" class="demo-src">
+<header style="background:linear-gradient(120deg,#e44d26,#f16529);color:#fff;border-radius:10px;padding:16px 20px">
+  <h1 style="margin:0;font-size:22px">邓佳燕 · 前端学习笔记</h1>
+  <nav style="margin-top:8px;font-size:13px">
+    <a href="#about" style="color:#fff;margin-right:14px">关于我</a>
+    <a href="#skill" style="color:#fff;margin-right:14px">技能表</a>
+    <a href="#msg" style="color:#fff">留言</a>
+  </nav>
+</header>
+<div style="display:flex;gap:14px;margin-top:12px;flex-wrap:wrap">
+  <main style="flex:3;min-width:260px">
+    <section id="about" style="background:#f7f9fc;border-radius:10px;padding:14px 18px;margin-bottom:12px">
+      <h2 style="margin:0 0 8px;font-size:18px;color:#e44d26">关于我</h2>
+      <p style="margin:4px 0">软件工程 1 班，正在系统学习前端三件套。这篇笔记是 HTML 阶段的成果汇总。</p>
+      <figure style="margin:10px 0 0;text-align:center">
+        <div style="height:70px;line-height:70px;background:linear-gradient(120deg,#ffe4d6,#ffd0bb);border-radius:8px;color:#b5401c;font-weight:700">封面图 · &lt;img alt="学习封面"&gt;</div>
+        <figcaption style="font-size:12px;color:#6c7686">图 14-1：figure + figcaption</figcaption>
+      </figure>
+    </section>
+    <section id="skill" style="background:#f7f9fc;border-radius:10px;padding:14px 18px;margin-bottom:12px">
+      <h2 style="margin:0 0 8px;font-size:18px;color:#e44d26">技能进度表</h2>
+      <table>
+        <caption style="font-size:12px;color:#6c7686">2026 秋季学期自评</caption>
+        <tr><th>技能</th><th>掌握度</th><th>状态</th></tr>
+        <tr><td>HTML</td><td><progress value="80" max="100"></progress></td><td>熟练</td></tr>
+        <tr><td>CSS</td><td><progress value="55" max="100"></progress></td><td>学习中</td></tr>
+        <tr><td>JavaScript</td><td><progress value="25" max="100"></progress></td><td>入门</td></tr>
+      </table>
+    </section>
+    <section id="msg" style="background:#f7f9fc;border-radius:10px;padding:14px 18px">
+      <h2 style="margin:0 0 8px;font-size:18px;color:#e44d26">给我留言</h2>
+      <form action="#" method="post" onsubmit="alert('演示表单：不会真的提交');return false">
+        <fieldset style="border:1px solid #dfe4ea;border-radius:8px">
+          <legend style="font-size:13px">留言信息</legend>
+          <p><label for="n">昵称：</label><input id="n" name="nick" required placeholder="怎么称呼你"></p>
+          <p><label for="m">内容：</label><br><textarea id="m" name="msg" rows="2" cols="30" required></textarea></p>
+          <p><label><input type="checkbox" name="agree" checked> 同意展示在页面上</label></p>
+          <button type="submit">发送留言</button>
+        </fieldset>
+      </form>
+    </section>
+  </main>
+  <aside style="flex:1;min-width:180px;background:#fff8f5;border:1px solid #ffd9c9;border-radius:10px;padding:14px 18px;align-self:flex-start">
+    <h3 style="margin:0 0 8px;font-size:15px;color:#c33d1c">学习清单</h3>
+    <ol style="padding-left:18px;margin:0"><li>HTML 语义化</li><li>CSS 布局</li><li>JS 基础</li><li>响应式</li><li>工程化</li></ol>
+    <details style="margin-top:10px"><summary style="font-size:13px">今日速记</summary>
+      <p style="font-size:12px;color:#555">结构先行，样式后补；alt 与 label 一个都不能少。</p></details>
+  </aside>
+</div>
+<footer style="text-align:center;color:#6c7686;font-size:12px;margin-top:14px;padding:10px;border-top:1px solid #e2e7ee">
+  © 2026 邓佳燕 · <a href="#top">回到顶部</a> · <time datetime="2026-11-18">2026-11-18</time>
+</footer>
+</script>
+  </div>
+  <div class="callout info"><span class="lb">配套文件</span><p>仓库中的 <code class="inline">examples/complete-page.html</code> 是这份示例的<strong>完整文档版本</strong>（含 DOCTYPE、head、body），可以直接双击在浏览器打开或作为新项目的起点。</p></div>
+
+  <h3 class="sub" id="ch-14-3">14.3 这个页面用到了哪些知识点</h3>
+  <div class="tw"><table class="t">
+    <tr><th>章节</th><th>在实战中的落点</th></tr>
+    <tr><td>02 文档骨架</td><td>完整的 head + body 组织（见配套文件）</td></tr>
+    <tr><td>04 链接与图片</td><td>nav 锚点导航、figure / figcaption、外链</td></tr>
+    <tr><td>05 / 06 列表表格</td><td>aside 有序清单、技能进度表格</td></tr>
+    <tr><td>07 表单</td><td>label、fieldset / legend、required、textarea、checkbox</td></tr>
+    <tr><td>08 语义化</td><td>header / nav / main / section / aside / footer / time</td></tr>
+    <tr><td>12 HTML5</td><td>progress、details / summary</td></tr>
+    <tr><td>13 可访问性</td><td>label 关联、表单 name、语义层级、alt</td></tr>
+  </table></div>
+  <div class="recap"><b>本节速记：</b>先画结构草图 → 用语义标签搭骨架 → 逐个区块填内容 → 最后用 CSS 美化；HTML 阶段不追求好看，追求「结构正确」。</div>
+</section>
+
+<!-- ============ 15 ============ -->
+<section class="chapter" id="ch-15" data-group="实战篇">
+  <div class="chapter-head"><div class="chapter-num">15</div><div>
+    <h2 class="ch-title">速查表、自测题与后续路线</h2>
+    <p class="ch-desc">一页查完常用标签，再用 12 道题确认自己真的学会了。</p>
+  </div></div>
+
+  <h3 class="sub" id="ch-15-1">15.1 常用标签速查</h3>
+  <div class="grid2">
+    <div class="card"><h4>文档与结构</h4><ul>
+      <li><code class="inline">&lt;!DOCTYPE&gt; html head body</code></li>
+      <li><code class="inline">meta link style script title base</code></li>
+      <li><code class="inline">header nav main article section aside footer</code></li>
+    </ul></div>
+    <div class="card"><h4>文本与内容</h4><ul>
+      <li><code class="inline">h1~h6 p br hr div span</code></li>
+      <li><code class="inline">strong em b i del ins sub sup mark small</code></li>
+      <li><code class="inline">blockquote q pre code time figure figcaption</code></li>
+    </ul></div>
+    <div class="card"><h4>列表、表格、媒体</h4><ul>
+      <li><code class="inline">ul ol li dl dt dd</code></li>
+      <li><code class="inline">table caption thead tbody tfoot tr th td colgroup</code></li>
+      <li><code class="inline">img picture source audio video track iframe svg canvas</code></li>
+    </ul></div>
+    <div class="card"><h4>表单与交互</h4><ul>
+      <li><code class="inline">form input label button textarea select option optgroup</code></li>
+      <li><code class="inline">fieldset legend datalist output progress meter</code></li>
+      <li><code class="inline">details summary dialog template</code></li>
+    </ul></div>
+  </div>
+
+  <h3 class="sub" id="ch-15-2">15.2 高频属性速查</h3>
+  <div class="tw"><table class="t">
+    <tr><th>属性</th><th>适用</th><th>属性</th><th>适用</th></tr>
+    <tr><td><code class="inline">id / class / style / title</code></td><td>全局</td><td><code class="inline">data-* / hidden / tabindex</code></td><td>全局</td></tr>
+    <tr><td><code class="inline">href / target / rel / download</code></td><td>a、link</td><td><code class="inline">src / alt / width / height / loading</code></td><td>img、iframe</td></tr>
+    <tr><td><code class="inline">name / value / type / placeholder</code></td><td>表单控件</td><td><code class="inline">required / pattern / min / max / checked</code></td><td>表单控件</td></tr>
+    <tr><td><code class="inline">colspan / rowspan / scope</code></td><td>表格单元格</td><td><code class="inline">charset / content / property</code></td><td>meta</td></tr>
+    <tr><td><code class="inline">defer / async</code></td><td>script</td><td><code class="inline">controls / autoplay / loop / poster</code></td><td>video、audio</td></tr>
+  </table></div>
+
+  <div class="demo" data-title="示例 15-1 · 速查卡片的渲染效果">
+<script type="text/plain" class="demo-src">
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+  <div style="flex:1;min-width:150px;border:1px solid #e2e7ee;border-radius:8px;padding:10px 14px;background:#fff8f5">
+    <b style="color:#e44d26">结构</b><p style="margin:4px 0"><code>div span header main</code></p></div>
+  <div style="flex:1;min-width:150px;border:1px solid #e2e7ee;border-radius:8px;padding:10px 14px;background:#f2f8ff">
+    <b style="color:#2b7fd4">内容</b><p style="margin:4px 0"><code>h1 p a img table</code></p></div>
+  <div style="flex:1;min-width:150px;border:1px solid #e2e7ee;border-radius:8px;padding:10px 14px;background:#f3fbf6">
+    <b style="color:#198754">交互</b><p style="margin:4px 0"><code>form input button</code></p></div>
+</div>
+</script>
+  </div>
+
+  <h3 class="sub" id="ch-15-3">15.3 自测题（点击展开答案）</h3>
+  <div class="quiz"><summary>1. &lt;!DOCTYPE html&gt; 是 HTML 标签吗？省略会怎样？</summary><div class="ans">不是标签，是<strong>文档类型声明</strong>。省略会让浏览器进入怪异模式（Quirks Mode），盒模型等渲染行为与标准不一致。</div></div>
+  <div class="quiz"><summary>2. 标签、元素、属性三者有什么区别？</summary><div class="ans">标签是尖括号关键字；元素是「开始标签 + 内容 + 结束标签」整体；属性是在开始标签里补充信息的 <code class="inline">名="值"</code>。</div></div>
+  <div class="quiz"><summary>3. 哪些是空元素？举 5 个。</summary><div class="ans"><code class="inline">img、br、hr、input、meta、link、source、col</code> 等，它们没有内容也没有结束标签。</div></div>
+  <div class="quiz"><summary>4. 中文页面出现乱码，最先检查哪两处？</summary><div class="ans">文件本身的保存编码，以及 head 中是否<strong>最靠前</strong>写了 <code class="inline">&lt;meta charset="UTF-8"&gt;</code>。二者需一致。</div></div>
+  <div class="quiz"><summary>5. alt 与 title 的区别？</summary><div class="ans"><code class="inline">alt</code> 是图片的替代文本，加载失败时显示、供屏幕阅读器与搜索引擎使用；<code class="inline">title</code> 是鼠标悬停提示，不能替代 alt。</div></div>
+  <div class="quiz"><summary>6. target="_blank" 为什么要加 rel="noopener"？</summary><div class="ans">避免新打开的页面通过 <code class="inline">window.opener</code> 访问并篡改原页面，属于安全与性能最佳实践。</div></div>
+  <div class="quiz"><summary>7. GET 与 POST 该怎么选？</summary><div class="ans">GET 把数据拼在 URL 上，适合搜索/筛选等无副作用请求；POST 放请求体，适合登录、写入、上传等会改变服务器状态的操作。</div></div>
+  <div class="quiz"><summary>8. 表单里某个输入框的值没被提交，最可能是什么原因？</summary><div class="ans">控件缺少 <code class="inline">name</code> 属性，或者被 <code class="inline">disabled</code> 了。只有带 name 且未禁用的控件才会被序列化提交。</div></div>
+  <div class="quiz"><summary>9. colspan 与 rowspan 分别合并什么？</summary><div class="ans"><code class="inline">colspan</code> 横向合并列，<code class="inline">rowspan</code> 纵向合并行；合并后要删除被覆盖的单元格，避免表格错位。</div></div>
+  <div class="quiz"><summary>10. section、article、div 怎么选？</summary><div class="ans">内容可独立分发（文章、帖子）用 <code class="inline">article</code>；有主题的分组（通常带标题）用 <code class="inline">section</code>；纯样式/布局容器用 <code class="inline">div</code>。</div></div>
+  <div class="quiz"><summary>11. defer 与 async 的执行顺序有什么不同？</summary><div class="ans">两者都并行下载；<code class="inline">defer</code> 等 HTML 解析完按顺序执行，<code class="inline">async</code> 下载完立即执行、不保证顺序。页面脚本优先 defer。</div></div>
+  <div class="quiz"><summary>12. 为什么「样式丢失后页面仍能读」也算写得好？</summary><div class="ans">说明文档用了正确的语义标签与标题层级，内容顺序本身就有逻辑。这对屏幕阅读器、搜索引擎、弱网环境都很重要。</div></div>
+
+  <h3 class="sub" id="ch-15-4">15.4 接下来学什么</h3>
+  <div class="tw"><table class="t">
+    <tr><th>阶段</th><th>目标</th></tr>
+    <tr><td>CSS 基础</td><td>选择器、盒模型、Flex / Grid 布局、响应式与媒体查询</td></tr>
+    <tr><td>JavaScript 基础</td><td>变量、函数、DOM 操作、事件、异步与 fetch</td></tr>
+    <tr><td>工程化</td><td>Git、包管理、构建工具、框架（Vue / React）</td></tr>
+    <tr><td>进阶</td><td>可访问性审计、性能优化、SEO、Web Components</td></tr>
+  </table></div>
+  <div class="recap"><b>本节速记：</b>先用速查表回忆，再用自测题查漏；HTML 打底之后，下一步是 CSS 布局与 JavaScript 交互。</div>
+</section>
+
+<footer class="end">
+  HTML 完整学习笔记 · 共 15 章 · 全部示例均为浏览器真实渲染<br>
+  作者：邓佳燕（软件工程 1 班） · 仓库：hey-yancy/html-learning
+</footer>
+</div></main>
+
+<button class="to-top" id="toTop" aria-label="回到顶部">↑</button>
+
+<script>
+(function(){
+  "use strict";
+  var CLOSE = '<' + '/script>';
+
+  /* ---------- 主题 ---------- */
+  var body = document.body;
+  try{ if(localStorage.getItem('html-note-theme')==='dark') body.setAttribute('data-theme','dark'); }catch(e){}
+  document.getElementById('themeBtn').addEventListener('click', function(){
+    var dark = body.getAttribute('data-theme')==='dark';
+    if(dark) body.removeAttribute('data-theme'); else body.setAttribute('data-theme','dark');
+    try{ localStorage.setItem('html-note-theme', dark?'light':'dark'); }catch(e){}
+  });
+
+  /* ---------- 代码高亮 ---------- */
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function hl(s){
+    return esc(s).replace(/(&lt;!--[\s\S]*?--&gt;)|(&lt;\/?)([a-zA-Z][\w:-]*)|([a-zA-Z_:][\w:.-]*)(=)(&quot;[^&]*?&quot;|'[^']*')|(&amp;[#a-zA-Z0-9]+;)/g,
+      function(m, com, open, tag, attr, eq, val, ent){
+        if(com)  return '<span class="tk-com">'+com+'</span>';
+        if(open) return open+'<span class="tk-tag">'+tag+'</span>';
+        if(attr) return '<span class="tk-attr">'+attr+'</span>'+eq+'<span class="tk-str">'+val+'</span>';
+        if(ent)  return '<span class="tk-ent">'+ent+'</span>';
+        return m;
+      });
+  }
+
+  /* ---------- 示例：源码 → 代码块 + 真实运行效果 ---------- */
+  var DEMO_CSS = [
+    'html{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:#1e2532}',
+    'body{margin:0;padding:16px 18px;font-size:14px;line-height:1.7;background:#fff}',
+    'h1{font-size:24px;margin:0 0 10px}h2{font-size:20px;margin:14px 0 8px}',
+    'h3{font-size:17px;margin:14px 0 8px}h4{font-size:15px;margin:14px 0 6px}',
+    'p{margin:8px 0}hr{border:0;border-top:1px solid #e2e7ee;margin:14px 0}',
+    'a{color:#e44d26}code{background:#fff2ed;color:#c33d1c;padding:1px 5px;border-radius:4px;font-size:.92em}',
+    'pre{background:#f5f7fa;border:1px solid #e2e7ee;border-radius:8px;padding:10px 12px;overflow:auto;font-size:13px}',
+    'blockquote{margin:10px 0;padding:8px 14px;border-left:3px solid #e44d26;background:#fff8f5;color:#555}',
+    'table{border-collapse:collapse;width:100%;margin:10px 0;font-size:13px}',
+    'th,td{border:1px solid #dfe4ea;padding:7px 10px;text-align:left}',
+    'th{background:#f5f7fa}caption{font-weight:700;margin-bottom:6px}',
+    'ul,ol,dl{padding-left:22px;margin:8px 0}li,dd{margin:4px 0}dt{font-weight:700;margin-top:8px}',
+    'input,select,textarea,button{font:inherit;padding:5px 9px;border:1px solid #cfd6e0;border-radius:6px;margin:3px 0}',
+    'button{background:#e44d26;color:#fff;border-color:#e44d26;cursor:pointer}',
+    'fieldset{border:1px solid #dfe4ea;border-radius:8px;padding:10px 14px;margin:10px 0}',
+    'legend{font-weight:700;padding:0 6px}img{max-width:100%}',
+    'header,nav,main,section,article,aside,footer{display:block}',
+    'small{color:#6c7686}mark{background:#ffe9a8}'
+  ].join('');
+
+  var REPORTER = "(function(){function r(){parent.postMessage({__demoHeight:1,h:document.documentElement.scrollHeight+10},'*')}"+
+    "window.addEventListener('load',r);if(window.ResizeObserver){new ResizeObserver(r).observe(document.body)}"+
+    "setTimeout(r,80);setTimeout(r,500)})();";
+
+  function buildDoc(src){
+    return '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8">'+
+      '<meta name="viewport" content="width=device-width,initial-scale=1"><style>'+DEMO_CSS+'</style></head><body>'+
+      src+'<'+'script>'+REPORTER+CLOSE+'</body></html>';
+  }
+
+  document.querySelectorAll('.demo').forEach(function(d, idx){
+    var raw = d.querySelector('.demo-src');
+    if(!raw) return;
+    var src = raw.textContent.replace(/^\n+|\s+$/g,'').replace(/<\\\//g,'</');
+    var title = d.getAttribute('data-title') || ('示例 '+(idx+1));
+    var head = '<div class="demo-head"><span class="demo-title">'+title+'</span>'+
+      '<span class="demo-actions"><button type="button" class="js-copy">复制代码</button>'+
+      '<button type="button" class="js-open">新窗口运行</button></span></div>';
+    var rest = '<pre class="code"><code>'+hl(src)+'</code></pre>'+
+      '<div class="preview"><div class="browser-bar"><span class="dots"><i></i><i></i><i></i></span>'+
+      '<span class="url">运行效果 · localhost / demo-'+(idx+1)+'.html</span><span class="live">LIVE</span></div>'+
+      '<iframe title="'+title+'" sandbox="allow-scripts allow-forms" loading="lazy"></iframe></div>'+
+      '<div class="preview-cap">上图为浏览器真实渲染结果（示例源码直接注入 iframe），可点击、可输入，与上方代码完全一致。</div>';
+    d.insertAdjacentHTML('afterbegin', head);
+    d.insertAdjacentHTML('beforeend', rest);
+    var frame = d.querySelector('iframe');
+    var doc = buildDoc(src);
+    frame.srcdoc = doc;
+    d.querySelector('.js-copy').addEventListener('click', function(){
+      var btn = this;
+      var done = function(){ btn.textContent='已复制'; btn.classList.add('ok'); setTimeout(function(){btn.textContent='复制代码';btn.classList.remove('ok')},1600); };
+      if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(src).then(done, fallback); } else { fallback(); }
+      function fallback(){ var ta=document.createElement('textarea');ta.value=src;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done()}catch(e){}ta.remove(); }
+    });
+    d.querySelector('.js-open').addEventListener('click', function(){
+      var clean = doc.split('<'+'script>'+REPORTER+CLOSE).join('');
+      var blob = new Blob([clean],{type:'text/html'});
+      window.open(URL.createObjectURL(blob),'_blank');
+    });
+  });
+
+  window.addEventListener('message', function(e){
+    if(!e.data || !e.data.__demoHeight || !e.source) return;
+    var frames = document.querySelectorAll('.demo iframe');
+    for(var i=0;i<frames.length;i++){
+      if(frames[i].contentWindow === e.source){
+        frames[i].style.height = Math.min(Math.max(e.data.h, 96), 1100)+'px';
+        break;
+      }
+    }
+  });
+
+  /* ---------- 生成索引目录 ---------- */
+  var toc = document.getElementById('toc');
+  var groups = [], gmap = {};
+  document.querySelectorAll('.chapter').forEach(function(sec){
+    var g = sec.getAttribute('data-group') || '其他';
+    if(!gmap[g]){ gmap[g] = {name:g, items:[]}; groups.push(gmap[g]); }
+    var h2 = sec.querySelector('h2.ch-title');
+    var num = sec.querySelector('.chapter-num');
+    var item = {id:sec.id, num:num?num.textContent:'', title:h2?h2.textContent:'', subs:[]};
+    sec.querySelectorAll('h3.sub').forEach(function(h){ item.subs.push({id:h.id,title:h.textContent}); });
+    gmap[g].items.push(item);
+  });
+  document.getElementById('chapterCount').textContent = document.querySelectorAll('.chapter').length;
+  var tocHtml = '';
+  groups.forEach(function(g, gi){
+    tocHtml += '<div class="toc-group" data-g="'+gi+'"><div class="toc-group-title">'+g.name+'<span class="chev">▾</span></div><div class="toc-list">';
+    g.items.forEach(function(it){
+      tocHtml += '<a class="toc-item" href="#'+it.id+'" data-id="'+it.id+'"><span class="num">'+it.num+'</span>'+it.title+'</a>';
+      it.subs.forEach(function(s){ tocHtml += '<a class="toc-sub" href="#'+s.id+'" data-id="'+s.id+'">'+s.title+'</a>'; });
+    });
+    tocHtml += '</div></div>';
+  });
+  toc.innerHTML = tocHtml;
+  toc.querySelectorAll('.toc-group-title').forEach(function(t){
+    t.addEventListener('click', function(){ t.parentNode.classList.toggle('collapsed'); });
+  });
+
+  /* ---------- 目录搜索 ---------- */
+  var search = document.getElementById('search');
+  var tocEmpty = document.getElementById('tocEmpty');
+  search.addEventListener('input', function(){
+    var q = this.value.trim().toLowerCase();
+    var shown = 0;
+    toc.querySelectorAll('.toc-group').forEach(function(g){
+      var visibleInGroup = 0;
+      g.querySelectorAll('.toc-item, .toc-sub').forEach(function(a){
+        var match = !q || a.textContent.toLowerCase().indexOf(q) > -1;
+        a.style.display = match ? '' : 'none';
+        if(match){ shown++; visibleInGroup++; }
+      });
+      g.style.display = visibleInGroup ? '' : 'none';
+      if(q) g.classList.remove('collapsed');
+    });
+    tocEmpty.style.display = shown ? 'none' : 'block';
+  });
+  document.addEventListener('keydown', function(e){
+    if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='k'){ e.preventDefault(); search.focus(); }
+    if(e.key === 'Escape'){ search.value=''; search.dispatchEvent(new Event('input')); search.blur(); }
+  });
+
+  /* ---------- 滚动高亮 / 进度 / 回顶 ---------- */
+  var links = [].slice.call(toc.querySelectorAll('[data-id]'));
+  var targets = links.map(function(a){ return document.getElementById(a.getAttribute('data-id')); }).filter(Boolean);
+  var progress = document.getElementById('progress');
+  var toTop = document.getElementById('toTop');
+  var ticking = false;
+  function onScroll(){
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    progress.style.width = (h>0 ? (window.scrollY/h*100) : 0)+'%';
+    var current = targets[0];
+    for(var i=0;i<targets.length;i++){ if(targets[i].getBoundingClientRect().top <= 130) current = targets[i]; }
+    links.forEach(function(a){ a.classList.toggle('active', !!current && a.getAttribute('data-id')===current.id); });
+    toTop.classList.toggle('show', window.scrollY > 400);
+    ticking = false;
+  }
+  window.addEventListener('scroll', function(){ if(!ticking){ ticking=true; requestAnimationFrame(onScroll); } }, {passive:true});
+  onScroll();
+  toTop.addEventListener('click', function(){ window.scrollTo({top:0,behavior:'smooth'}); });
+
+  /* ---------- 移动端抽屉 ---------- */
+  var sidebar = document.getElementById('sidebar'), overlay = document.getElementById('overlay');
+  function closeSide(){ sidebar.classList.remove('open'); overlay.classList.remove('show'); }
+  document.getElementById('menuBtn').addEventListener('click', function(){
+    sidebar.classList.toggle('open'); overlay.classList.toggle('show');
+  });
+  overlay.addEventListener('click', closeSide);
+  toc.addEventListener('click', function(e){ if(e.target.closest('a') && window.innerWidth<=1000) closeSide(); });
+})();
+</script>
+</body>
+</html>
